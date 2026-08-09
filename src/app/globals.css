@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-brand-50: #fff1f2;
+  --color-brand-100: #ffe1e3;
+  --color-brand-200: #ffc8cc;
+  --color-brand-300: #ffa0a8;
+  --color-brand-400: #fc6774;
+  --color-brand-500: #f43f4f;
+  --color-brand-600: #e11d2e;
+  --color-brand-700: #bd1626;
+  --color-brand-800: #9c1625;
+  --color-brand-900: #811824;
+  --color-brand-950: #470810;
+
+  --color-ink-50: #f6f6f7;
+  --color-ink-100: #e3e3e6;
+  --color-ink-200: #c9c9ce;
+  --color-ink-300: #a4a4ac;
+  --color-ink-400: #787883;
+  --color-ink-500: #5d5d67;
+  --color-ink-600: #4f4f58;
+  --color-ink-700: #43434b;
+  --color-ink-800: #3b3b42;
+  --color-ink-900: #191920;
+  --color-ink-950: #0d0d12;
+
+  --color-cream: #faf9f7;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf9f7;
+  --foreground: #0d0d12;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--color-ink-200);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-brand-600);
+  color: #fff;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease both;
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.25s ease both;
 }
