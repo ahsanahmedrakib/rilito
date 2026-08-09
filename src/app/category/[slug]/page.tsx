@@ -1,35 +1,35 @@
+"use client";
+
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ArrowRight } from "@/components/shared/components/icons";
 import { ProductCard } from "@/features/product/components/ProductCard";
-import { getCategoryBySlug, productsByCategory } from "@/lib/data";
-import type { Metadata } from "next";
+import { getCategoryBySlug } from "@/features/category/data/categories";
+import { useStore } from "@/lib/store";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
+export default function CategoryPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const { products } = useStore();
   const category = getCategoryBySlug(slug);
-  if (!category) return { title: "Category not found — Rilito" };
-  return {
-    title: `${category.name} — Rilito`,
-    description: `Shop ${category.name} at Rilito. ${category.tagline}.`,
-  };
-}
+  const categoryProducts = products.filter((p) => p.category === slug);
 
-export default async function CategoryPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const category = getCategoryBySlug(slug);
-  if (!category) notFound();
-  const products = productsByCategory(slug);
+  if (!category) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-24 text-center">
+        <h1 className="text-2xl font-extrabold uppercase tracking-tight text-ink-950">
+          Category not found
+        </h1>
+        <Link
+          href="/products"
+          className="mt-6 inline-block rounded-full bg-brand-600 px-6 py-3 text-sm font-bold uppercase text-white transition hover:bg-brand-700"
+        >
+          Browse Products
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -62,8 +62,9 @@ export default async function CategoryPage({
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <p className="text-sm text-ink-500">
-            <span className="font-bold text-ink-950">{products.length}</span>{" "}
-            {products.length === 1 ? "product" : "products"} in {category.name}
+            <span className="font-bold text-ink-950">{categoryProducts.length}</span>{" "}
+            {categoryProducts.length === 1 ? "product" : "products"} in{" "}
+            {category.name}
           </p>
           <Link
             href={`/products?category=${category.slug}`}
@@ -74,7 +75,7 @@ export default async function CategoryPage({
           </Link>
         </div>
 
-        {products.length === 0 ? (
+        {categoryProducts.length === 0 ? (
           <div className="mt-10 rounded-2xl bg-white py-20 text-center ring-1 ring-ink-200/60">
             <p className="text-lg font-bold text-ink-950">Nothing here yet</p>
             <p className="mt-2 text-sm text-ink-500">
@@ -83,7 +84,7 @@ export default async function CategoryPage({
           </div>
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-3 md:gap-4 xl:grid-cols-4">
-            {products.map((p) => (
+            {categoryProducts.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

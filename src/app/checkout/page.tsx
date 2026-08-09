@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
 import { useStore } from "@/lib/store";
-import { isValidPhone } from "@/features/auth/data/validation";
-import { PROMO_CODE, PROMO_DISCOUNT_PERCENT } from "@/features/cart/data/shipping";
+import { discountForCoupon } from "@/lib/coupons";
+import { formatPrice } from "@/lib/utils";
 import {
   FREE_SHIPPING_THRESHOLD,
   quoteShipping,
@@ -13,56 +15,55 @@ import {
   type PaymentMethodId,
 } from "@/features/checkout/data/checkout";
 import {
-  CheckoutAddressForm,
+  checkoutSchema,
   type CheckoutAddress,
-} from "@/components/features/checkout/components/CheckoutAddressForm";
+} from "@/features/checkout/data/checkoutSchemas";
+import { CheckoutAddressForm } from "@/components/features/checkout/components/CheckoutAddressForm";
 import { CheckoutDeliveryMethod } from "@/components/features/checkout/components/CheckoutDeliveryMethod";
 import { CheckoutPaymentMethod } from "@/components/features/checkout/components/CheckoutPaymentMethod";
 import { CheckoutSummary } from "@/components/features/checkout/components/CheckoutSummary";
 
 export default function CheckoutPage() {
-  const { cart, cartSubtotal, clearCart, placeOrder, toast, user } = useStore();
+  const { cart, cartSubtotal, clearCart, placeOrder, toast, user, coupons } = useStore();
   const router = useRouter();
 
-  const [form, setForm] = useState<CheckoutAddress>({
-    name: user?.name ?? "",
-    phone: user?.phone ?? "",
-    email: user?.email ?? "",
-    address: user?.address ?? "",
-    city: user?.city ?? "Dhaka",
-    area: "",
-    note: "",
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<CheckoutAddress>({
+    resolver: yupResolver(checkoutSchema),
+    defaultValues: {
+      name: user?.name ?? "",
+      phone: user?.phone ?? "",
+      email: user?.email ?? "",
+      address: user?.address ?? "",
+      city: user?.city ?? "Dhaka",
+      area: "",
+      note: "",
+    },
   });
+  const phone = watch("phone");
   const [delivery, setDelivery] = useState<DeliveryMethodId>("standard");
   const [payment, setPayment] = useState<PaymentMethodId>("cod");
   const [discount, setDiscount] = useState(0);
   const [placing, setPlacing] = useState(false);
 
-  const set = (key: keyof CheckoutAddress) => (value: string) =>
-    setForm((f) => ({ ...f, [key]: value }));
-
   const shipping = quoteShipping({ subtotal: cartSubtotal, delivery });
   const total = cartSubtotal - discount + shipping;
 
   const applyPromo = (code: string) => {
-    if (code.trim().toUpperCase() === PROMO_CODE) {
-      setDiscount(Math.round(cartSubtotal * (PROMO_DISCOUNT_PERCENT / 100)));
-      toast("Coupon applied", "10% off (code RILITO10)");
+    const value = discountForCoupon(coupons, code, cartSubtotal);
+    if (value > 0) {
+      setDiscount(value);
+      toast("Coupon applied", `${code.trim().toUpperCase()} — ${formatPrice(value)} off`);
     } else {
-      toast("Invalid coupon", "Try RILITO10 for 10% off", "info");
+      toast("Invalid coupon", "This code isn't active", "info");
     }
   };
 
-  const place = () => {
-    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
-      toast("Missing details", "Please fill in your name, phone and address", "info");
-      return;
-    }
-    if (!isValidPhone(form.phone)) {
-      toast("Check phone number", "Enter an 11-digit number starting with 01", "info");
-      return;
-    }
-
+  const place = handleSubmit((values: CheckoutAddress) => {
     setPlacing(true);
     setTimeout(() => {
       const order = placeOrder({
@@ -70,12 +71,12 @@ export default function CheckoutPage() {
         subtotal: cartSubtotal,
         shipping,
         discount,
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        email: form.email.trim(),
-        address: form.address.trim(),
-        city: form.city,
-        area: form.area.trim(),
+        name: values.name,
+        phone: values.phone,
+        email: values.email ?? "",
+        address: values.address,
+        city: values.city,
+        area: values.area ?? "",
         payment,
       });
       clearCart();
@@ -83,7 +84,7 @@ export default function CheckoutPage() {
       router.push(`/order/${order.id}`);
       toast("Order placed!", `Your order ID is ${order.id}`);
     }, 1200);
-  };
+  });
 
   if (cart.length === 0) {
     return (
@@ -110,13 +111,13 @@ export default function CheckoutPage() {
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_400px]">
         <div className="space-y-6">
-          <CheckoutAddressForm form={form} onChange={set} />
+          <CheckoutAddressForm register={register} errors={errors} />
           <CheckoutDeliveryMethod
             delivery={delivery}
             freeDelivery={cartSubtotal >= FREE_SHIPPING_THRESHOLD}
             onSelect={setDelivery}
           />
-          <CheckoutPaymentMethod payment={payment} total={total} phone={form.phone} onSelect={setPayment} />
+          <CheckoutPaymentMethod payment={payment} total={total} phone={phone} onSelect={setPayment} />
         </div>
 
         <CheckoutSummary

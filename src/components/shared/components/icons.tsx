@@ -180,6 +180,12 @@ export const CheckCircleIcon = make(
     <path d="M8 12.5l2.5 2.5L16 9.5" />
   </>
 );
+export const TagIcon = make(
+  <>
+    <path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z" />
+    <circle cx="7.5" cy="7.5" r="1.5" />
+  </>
+);
 
 export const FacebookIcon = make(
   <path d="M14 8h3V4.5h-3c-2.5 0-4 1.8-4 4.2V11H7v3.5h3V21h3.5v-6.5h2.7l.5-3.5h-3.2V9c0-.6.3-1 .7-1z" />

@@ -1,73 +1,53 @@
 "use client";
 
-import { LockIcon, UserIcon } from "@/components/shared/components/icons";
-import {
-  isValidPhone,
-  MIN_PASSWORD_LENGTH,
-  validateName,
-} from "@/features/auth/data/validation";
-import { useStore } from "@/lib/store";
+import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  registerSchema,
+  type RegisterValues,
+} from "@/features/auth/data/authSchemas";
+import { useStore } from "@/lib/store";
+import { LockIcon, UserIcon } from "@/components/shared/components/icons";
+import { cn } from "@/lib/utils";
 
 const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-ink-400 focus:border-ink-950";
 
 export function RegisterForm() {
-  const { register, toast } = useStore();
+  const { register: registerUser, toast } = useStore();
   const router = useRouter();
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirm: "",
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<RegisterValues>({
+    resolver: yupResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirm: "",
+    },
   });
 
-  const set =
-    (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
-      setForm((f) => ({ ...f, [k]: e.target.value }));
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateName(form.name))
-      return toast("Missing name", "Please enter your name", "info");
-    if (!isValidPhone(form.phone))
-      return toast(
-        "Check phone",
-        "Enter an 11-digit number starting with 01",
-        "info",
-      );
-    if (form.password.length < MIN_PASSWORD_LENGTH)
-      return toast(
-        "Weak password",
-        "Password must be at least 6 characters",
-        "info",
-      );
-    if (form.password !== form.confirm)
-      return toast(
-        "Passwords don't match",
-        "Please re-enter your password",
-        "info",
-      );
-
-    const ok = register({
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      password: form.password,
+  const submit = (values: RegisterValues) => {
+    const ok = registerUser({
+      name: values.name.trim(),
+      phone: values.phone.trim(),
+      email: values.email ?? "",
+      password: values.password,
       address: "",
       city: "Dhaka",
     });
-    if (!ok)
-      return toast(
-        "Email already registered",
-        "Try signing in instead",
-        "info",
-      );
-
-    toast("Account created!", `Welcome to Rilito, ${form.name.split(" ")[0]}`);
+    if (!ok) {
+      setError("email", { message: "This email is already registered — try signing in." });
+      return;
+    }
+    toast("Account created!", `Welcome to Rilito, ${values.name.split(" ")[0]}`);
     router.push("/account");
   };
 
@@ -83,31 +63,37 @@ export function RegisterForm() {
         Faster checkout, order history and saved addresses.
       </p>
 
-      <form onSubmit={submit} className="mt-7 space-y-4">
+      <form onSubmit={handleSubmit(submit)} className="mt-7 space-y-4">
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
             Full Name *
           </label>
           <input
-            value={form.name}
-            onChange={set("name")}
             placeholder="Your name"
-            className={inputCls}
-            required
+            className={cn(inputCls, errors.name && "border-red-400")}
+            {...register("name")}
           />
+          {errors.name && (
+            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              {errors.name.message}
+            </p>
+          )}
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
             Phone Number *
           </label>
           <input
-            value={form.phone}
-            onChange={set("phone")}
             placeholder="01XXXXXXXXX"
             inputMode="tel"
-            className={inputCls}
-            required
+            className={cn(inputCls, errors.phone && "border-red-400")}
+            {...register("phone")}
           />
+          {errors.phone && (
+            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              {errors.phone.message}
+            </p>
+          )}
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
@@ -115,11 +101,15 @@ export function RegisterForm() {
           </label>
           <input
             type="email"
-            value={form.email}
-            onChange={set("email")}
             placeholder="you@example.com"
-            className={inputCls}
+            className={cn(inputCls, errors.email && "border-red-400")}
+            {...register("email")}
           />
+          {errors.email && (
+            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              {errors.email.message}
+            </p>
+          )}
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
@@ -129,13 +119,16 @@ export function RegisterForm() {
             <LockIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
             <input
               type="password"
-              value={form.password}
-              onChange={set("password")}
               placeholder="Min 6 characters"
-              className={`${inputCls} pl-11`}
-              required
+              className={cn(inputCls, "pl-11", errors.password && "border-red-400")}
+              {...register("password")}
             />
           </div>
+          {errors.password && (
+            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              {errors.password.message}
+            </p>
+          )}
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
@@ -143,12 +136,15 @@ export function RegisterForm() {
           </label>
           <input
             type="password"
-            value={form.confirm}
-            onChange={set("confirm")}
             placeholder="Repeat password"
-            className={inputCls}
-            required
+            className={cn(inputCls, errors.confirm && "border-red-400")}
+            {...register("confirm")}
           />
+          {errors.confirm && (
+            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              {errors.confirm.message}
+            </p>
+          )}
         </div>
         <button
           type="submit"
@@ -160,10 +156,7 @@ export function RegisterForm() {
 
       <p className="mt-6 text-center text-sm text-ink-500">
         Already have an account?{" "}
-        <Link
-          href="/login"
-          className="font-bold text-brand-700 hover:text-brand-800"
-        >
+        <Link href="/login" className="font-bold text-brand-700 hover:text-brand-800">
           Sign in
         </Link>
       </p>

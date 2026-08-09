@@ -44,6 +44,8 @@ export function Header() {
     setShowCat(false);
   }, [pathname]);
 
+  if (pathname.startsWith("/admin")) return null;
+
   const revealCategories = () => {
     if (hoverTimer.current) clearTimeout(hoverTimer.current);
     setShowCat(true);

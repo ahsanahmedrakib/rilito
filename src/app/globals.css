@@ -111,3 +111,23 @@ body {
 .animate-scale-in {
   animation: scale-in 0.25s ease both;
 }
+
+.swiper {
+  z-index: 0;
+}
+
+.swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  width: 32px;
+  background: var(--color-brand-500);
+}

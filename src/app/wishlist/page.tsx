@@ -2,13 +2,12 @@
 
 import { ArrowRight, HeartIcon } from "@/components/shared/components/icons";
 import { ProductCard } from "@/features/product/components/ProductCard";
-import { allProducts } from "@/lib/data";
 import { useStore } from "@/lib/store";
 import Link from "next/link";
 
 export default function WishlistPage() {
-  const { wishlist, toggleWishlist, toast } = useStore();
-  const items = allProducts.filter((p) => wishlist.includes(p.slug));
+  const { wishlist, toggleWishlist, toast, products } = useStore();
+  const items = products.filter((p) => wishlist.includes(p.slug));
 
   if (wishlist.length === 0) {
     return (

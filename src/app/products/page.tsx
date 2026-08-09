@@ -1,3 +1,6 @@
+"use client";
+
+import { Suspense, useMemo } from "react";
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import {
   ChevronLeft,
@@ -7,72 +10,61 @@ import {
 import { PriceRangeFilter } from "@/features/product/components/PriceRangeFilter";
 import { ProductCard } from "@/features/product/components/ProductCard";
 import { SortSelect } from "@/features/product/components/SortSelect";
-import { allProducts, categories } from "@/lib/data";
+import { categories } from "@/features/category/data/categories";
+import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import type { Metadata } from "next";
+import type { Product } from "@/lib/types";
 import Link from "next/link";
-import { Suspense } from "react";
-
-export const metadata: Metadata = {
-  title: "Shop All Products — Rilito",
-  description:
-    "Browse the full Rilito collection — t-shirts, panjabi, shirts, pants, winter fashion, footwear and more.",
-};
+import { useSearchParams } from "next/navigation";
 
 const PER_PAGE = 12;
 
-function getSort(sort: string | undefined) {
+function getSort(sort: string) {
   switch (sort) {
     case "best-selling":
-      return (a: (typeof allProducts)[0], b: (typeof allProducts)[0]) =>
+      return (a: Product, b: Product) =>
         Number(b.isBestSeller) - Number(a.isBestSeller) || b.rating - a.rating;
     case "new":
-      return (a: (typeof allProducts)[0], b: (typeof allProducts)[0]) =>
+      return (a: Product, b: Product) =>
         Number(b.isNew) - Number(a.isNew) || b.rating - a.rating;
     case "price-asc":
-      return (a: (typeof allProducts)[0], b: (typeof allProducts)[0]) =>
+      return (a: Product, b: Product) =>
         (a.salePrice ?? a.price) - (b.salePrice ?? b.price);
     case "price-desc":
-      return (a: (typeof allProducts)[0], b: (typeof allProducts)[0]) =>
+      return (a: Product, b: Product) =>
         (b.salePrice ?? b.price) - (a.salePrice ?? a.price);
     case "rating":
-      return (a: (typeof allProducts)[0], b: (typeof allProducts)[0]) =>
-        b.rating - a.rating;
+      return (a: Product, b: Product) => b.rating - a.rating;
     default:
       return () => 0;
   }
 }
 
-export default async function ProductsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const sp = await searchParams;
-  const category = typeof sp.category === "string" ? sp.category : "";
-  const sort = typeof sp.sort === "string" ? sp.sort : "featured";
-  const q = typeof sp.q === "string" ? sp.q : "";
-  const min = Number(typeof sp.min === "string" ? sp.min : 0) || 0;
-  const max = Number(typeof sp.max === "string" ? sp.max : 5000) || 5000;
-  const page = Math.max(
-    1,
-    Number(typeof sp.page === "string" ? sp.page : 1) || 1,
-  );
+function ProductsBrowser() {
+  const { products } = useStore();
+  const searchParams = useSearchParams();
 
-  let results = allProducts.filter((p) => {
-    if (category && p.category !== category) return false;
-    const price = p.salePrice ?? p.price;
-    if (price < min || price > max) return false;
-    if (q) {
-      const hay =
-        `${p.name} ${p.description} ${p.tags.join(" ")}`.toLowerCase();
-      if (!q.split(/\s+/).every((t) => hay.includes((t || "").toLowerCase())))
-        return false;
-    }
-    return true;
-  });
+  const category = searchParams.get("category") ?? "";
+  const sort = searchParams.get("sort") ?? "featured";
+  const q = searchParams.get("q") ?? "";
+  const min = Number(searchParams.get("min")) || 0;
+  const max = Number(searchParams.get("max")) || 5000;
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
 
-  results = [...results].sort(getSort(sort));
+  const results = useMemo(() => {
+    let list = products.filter((p) => {
+      if (category && p.category !== category) return false;
+      const price = p.salePrice ?? p.price;
+      if (price < min || price > max) return false;
+      if (q) {
+        const hay = `${p.name} ${p.description} ${p.tags.join(" ")}`.toLowerCase();
+        if (!q.split(/\s+/).every((t) => hay.includes((t || "").toLowerCase())))
+          return false;
+      }
+      return true;
+    });
+    return [...list].sort(getSort(sort));
+  }, [products, category, min, max, q, sort]);
 
   const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
@@ -82,7 +74,6 @@ export default async function ProductsPage({
   const activeCategory = category
     ? categories.find((c) => c.slug === category)
     : undefined;
-
   const hasFilters = Boolean(category || q || min > 0 || max < 5000);
 
   const buildHref = (patch: Record<string, string | undefined>) => {
@@ -114,14 +105,11 @@ export default async function ProductsPage({
       <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-2xl font-extrabold uppercase tracking-tight text-ink-950 md:text-4xl">
-            {activeCategory?.name ??
-              (q ? `Results for "${q}"` : "All Products")}
+            {activeCategory?.name ?? (q ? `Results for "${q}"` : "All Products")}
           </h1>
           <p className="mt-1.5 text-sm text-ink-500">
             {total} {total === 1 ? "product" : "products"}
-            {activeCategory
-              ? ` in ${activeCategory.name}`
-              : " in our collection"}
+            {activeCategory ? ` in ${activeCategory.name}` : " in our collection"}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -150,33 +138,23 @@ export default async function ProductsPage({
                     href="/products"
                     className={cn(
                       "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition",
-                      !category
-                        ? "bg-ink-950 text-white"
-                        : "text-ink-700 hover:bg-ink-100",
+                      !category ? "bg-ink-950 text-white" : "text-ink-700 hover:bg-ink-100"
                     )}
                   >
                     All Products
-                    <span className="text-xs opacity-70">
-                      {allProducts.length}
-                    </span>
+                    <span className="text-xs opacity-70">{products.length}</span>
                   </Link>
                 </li>
                 {categories.map((c) => {
-                  const count = allProducts.filter(
-                    (p) => p.category === c.slug,
-                  ).length;
+                  const count = products.filter((p) => p.category === c.slug).length;
                   const active = category === c.slug;
                   return (
                     <li key={c.slug}>
                       <Link
-                        href={
-                          active ? "/products" : buildHref({ category: c.slug })
-                        }
+                        href={active ? "/products" : buildHref({ category: c.slug })}
                         className={cn(
                           "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition",
-                          active
-                            ? "bg-ink-950 text-white"
-                            : "text-ink-700 hover:bg-ink-100",
+                          active ? "bg-ink-950 text-white" : "text-ink-700 hover:bg-ink-100"
                         )}
                       >
                         {c.name}
@@ -202,12 +180,10 @@ export default async function ProductsPage({
         <div>
           {pageItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white py-24 text-center ring-1 ring-ink-200/60">
-              <p className="text-lg font-bold text-ink-950">
-                No products found
-              </p>
+              <p className="text-lg font-bold text-ink-950">No products found</p>
               <p className="max-w-sm text-sm text-ink-500">
-                Try adjusting your filters or clearing the search — there's
-                plenty more to explore.
+                Try adjusting your filters or clearing the search — there's plenty
+                more to explore.
               </p>
               <Link
                 href="/products"
@@ -246,7 +222,7 @@ export default async function ProductsPage({
                         "grid h-10 min-w-10 place-items-center rounded-full px-2 text-sm font-semibold transition",
                         n === current
                           ? "bg-brand-600 text-white"
-                          : "border border-ink-200 bg-white text-ink-900 hover:border-ink-950",
+                          : "border border-ink-200 bg-white text-ink-900 hover:border-ink-950"
                       )}
                     >
                       {n}
@@ -276,5 +252,13 @@ export default async function ProductsPage({
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ProductsBrowser />
+    </Suspense>
   );
 }

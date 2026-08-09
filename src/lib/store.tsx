@@ -10,8 +10,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CartItem, Order, Product, User } from "./types";
+import type { CartItem, Coupon, Order, Product, User } from "./types";
 import { generateOrderId } from "@/features/order/data/status";
+import { defaultCoupons } from "./coupons";
+import { allProducts } from "./data";
+
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "admin@rilito.com";
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD ?? "admin123";
 
 interface Toast {
   id: number;
@@ -43,8 +48,18 @@ interface StoreContextValue {
   login: (email: string, password: string) => boolean;
   logout: () => void;
   updateProfile: (patch: Partial<User>) => void;
+  isAdmin: boolean;
+  loginAdmin: (email: string, password: string) => boolean;
+  logoutAdmin: () => void;
+  products: Product[];
+  saveProduct: (product: Product) => void;
+  deleteProduct: (id: string) => void;
+  coupons: Coupon[];
+  saveCoupon: (coupon: Coupon) => void;
+  deleteCoupon: (code: string) => void;
   orders: Order[];
   placeOrder: (order: Omit<Order, "id" | "date" | "status" | "total">) => Order;
+  updateOrderStatus: (id: string, status: string) => void;
   toast: (title: string, description?: string, variant?: Toast["variant"]) => void;
   toasts: Toast[];
 }
@@ -66,6 +81,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [user, setUser] = useState<User | null>(null);
+  const [products, setProducts] = useState<Product[]>(allProducts);
+  const [coupons, setCoupons] = useState<Coupon[]>(defaultCoupons);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -79,6 +97,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCart(readLS("rilito-cart", []));
     setWishlist(readLS("rilito-wishlist", []));
     setOrders(readLS("rilito-orders", []));
+    const storedProducts = readLS<Product[] | null>("rilito-products", null);
+    if (storedProducts && storedProducts.length > 0) setProducts(storedProducts);
+    setCoupons(readLS("rilito-coupons", defaultCoupons()));
+    setIsAdmin(readLS("rilito-admin", false));
     const session = readLS<{ email: string } | null>("rilito-session", null);
     if (session) {
       const users = readLS<Array<User & { password: string }>>("rilito-users", []);
@@ -105,6 +127,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!hydrated.current) return;
     localStorage.setItem("rilito-orders", JSON.stringify(orders));
   }, [orders]);
+
+  useEffect(() => {
+    if (hydrated.current) return;
+    localStorage.setItem("rilito-products", JSON.stringify(products));
+  }, [products]);
+
+  useEffect(() => {
+    if (hydrated.current) return;
+    localStorage.setItem("rilito-coupons", JSON.stringify(coupons));
+  }, [coupons]);
 
   const toast = useCallback(
     (title: string, description?: string, variant: Toast["variant"] = "success") => {
@@ -221,7 +253,49 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-const placeOrder = useCallback(
+const loginAdmin = useCallback((email: string, password: string) => {
+    const ok =
+      email.trim().toLowerCase() === ADMIN_EMAIL &&
+      password === ADMIN_PASSWORD;
+    if (ok) {
+      setIsAdmin(true);
+      localStorage.setItem("rilito-admin", "true");
+    }
+    return ok;
+  }, []);
+
+  const logoutAdmin = useCallback(() => {
+    setIsAdmin(false);
+    localStorage.setItem("rilito-admin", "false");
+  }, []);
+
+  const saveProduct = useCallback((product: Product) => {
+    setProducts((prev) => {
+      const exists = prev.some((p) => p.id === product.id);
+      return exists
+        ? prev.map((p) => (p.id === product.id ? product : p))
+        : [...prev, product];
+    });
+  }, []);
+
+  const deleteProduct = useCallback((id: string) => {
+    setProducts((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
+  const saveCoupon = useCallback((coupon: Coupon) => {
+    setCoupons((prev) => {
+      const exists = prev.some((c) => c.code === coupon.code);
+      return exists
+        ? prev.map((c) => (c.code === coupon.code ? coupon : c))
+        : [...prev, coupon];
+    });
+  }, []);
+
+  const deleteCoupon = useCallback((code: string) => {
+    setCoupons((prev) => prev.filter((c) => c.code !== code));
+  }, []);
+
+  const placeOrder = useCallback(
     (order: Omit<Order, "id" | "date" | "status" | "total">): Order => {
       const newOrder: Order = {
         ...order,
@@ -235,6 +309,10 @@ const placeOrder = useCallback(
     },
     []
   );
+
+  const updateOrderStatus = useCallback((id: string, status: string) => {
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+  }, []);
 
   const value: StoreContextValue = {
     ready,
@@ -259,8 +337,18 @@ const placeOrder = useCallback(
     login,
     logout,
     updateProfile,
+    isAdmin,
+    loginAdmin,
+    logoutAdmin,
+    products,
+    saveProduct,
+    deleteProduct,
+    coupons,
+    saveCoupon,
+    deleteCoupon,
     orders,
     placeOrder,
+    updateOrderStatus,
     toast,
     toasts,
   };

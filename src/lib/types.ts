@@ -92,3 +92,10 @@ export interface User {
   address: string;
   city: string;
 }
+
+export interface Coupon {
+  code: string;
+  type: "percent" | "fixed";
+  value: number;
+  active: boolean;
+}

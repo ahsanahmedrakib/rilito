@@ -1,3 +1,5 @@
+"use client";
+
 import {
   CashIcon,
   FacebookIcon,
@@ -18,11 +20,14 @@ import {
   serviceLinks,
 } from "@/features/footer/data/links";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const help = serviceLinks;
 const company = companyLinks;
 
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) return null;
   return (
     <footer className="mt-20 bg-ink-950 text-ink-300">
       <div className="border-b border-white/10">
@@ -162,6 +167,12 @@ export function Footer() {
             <p className="text-xs text-white/50">
               © {new Date().getFullYear()} Rilito. All Rights Reserved.
             </p>
+            <Link
+              href="/admin"
+              className="rounded-full border border-white/15 px-3.5 py-1.5 text-xs font-semibold text-white/60 transition hover:border-brand-500 hover:text-brand-400"
+            >
+              Admin Panel
+            </Link>
           </div>
         </div>
       </div>

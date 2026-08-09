@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowRight,
   CashIcon,
@@ -10,13 +12,8 @@ import { SectionHeading } from "@/components/shared/components/SectionHeading";
 import { HeroSlider } from "@/features/home/components/HeroSlider";
 import { Newsletter } from "@/features/home/components/Newsletter";
 import { ProductScroller } from "@/features/product/components/ProductScroller";
-import {
-  bestSellers,
-  blogPosts,
-  categories,
-  newArrivals,
-  productsByCategory,
-} from "@/lib/data";
+import { blogPosts, categories } from "@/lib/data";
+import { useStore } from "@/lib/store";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -66,6 +63,11 @@ const testimonials = [
 ];
 
 export default function HomePage() {
+  const { products } = useStore();
+  const bestSellers = products.filter((p) => p.isBestSeller);
+  const newArrivals = products.filter((p) => p.isNew);
+  const byCategory = (slug: string) => products.filter((p) => p.category === slug);
+
   return (
     <>
       <HeroSlider />
@@ -217,7 +219,7 @@ export default function HomePage() {
                 link={`/category/${catSlug}`}
               />
               <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
-                {productsByCategory(catSlug)
+                {byCategory(catSlug)
                   .slice(0, 4)
                   .map((p) => (
                     <Link

@@ -1,10 +1,13 @@
 "use client";
 
-import { LockIcon, UserIcon } from "@/components/shared/components/icons";
-import { useStore } from "@/lib/store";
+import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { loginSchema, type LoginValues } from "@/features/auth/data/authSchemas";
+import { useStore } from "@/lib/store";
+import { LockIcon, UserIcon } from "@/components/shared/components/icons";
+import { cn } from "@/lib/utils";
 
 const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-ink-400 focus:border-ink-950";
@@ -12,18 +15,25 @@ const inputCls =
 export function LoginForm() {
   const { login, toast } = useStore();
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<LoginValues>({
+    resolver: yupResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const ok = login(email.trim(), password);
-    if (ok) {
-      toast("Welcome back!", "You're now signed in");
-      router.push("/account");
-    } else {
-      toast("Login failed", "Check your email and password", "info");
+  const submit = (values: LoginValues) => {
+    if (!login(values.email.trim(), values.password)) {
+      setError("root", {
+        message: "No account matches that email and password.",
+      });
+      return;
     }
+    toast("Welcome back!", "You're now signed in");
+    router.push("/account");
   };
 
   return (
@@ -38,19 +48,22 @@ export function LoginForm() {
         Sign in to access your orders and saved addresses.
       </p>
 
-      <form onSubmit={submit} className="mt-7 space-y-4">
+      <form onSubmit={handleSubmit(submit)} className="mt-7 space-y-4">
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
             Email
           </label>
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className={inputCls}
-            required
+            className={cn(inputCls, errors.email && "border-red-400")}
+            {...register("email")}
           />
+          {errors.email && (
+            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              {errors.email.message}
+            </p>
+          )}
         </div>
         <div>
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
@@ -60,14 +73,24 @@ export function LoginForm() {
             <LockIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               placeholder="Your password"
-              className={`${inputCls} pl-11`}
-              required
+              className={cn(inputCls, "pl-11", errors.password && "border-red-400")}
+              {...register("password")}
             />
           </div>
+          {errors.password && (
+            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              {errors.password.message}
+            </p>
+          )}
         </div>
+
+        {errors.root && (
+          <p className="rounded-xl bg-red-50 px-4 py-3 text-xs font-semibold text-red-700" role="alert">
+            {errors.root.message}
+          </p>
+        )}
+
         <button
           type="submit"
           className="w-full rounded-xl bg-brand-600 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
@@ -78,10 +101,7 @@ export function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-ink-500">
         New to Rilito?{" "}
-        <Link
-          href="/register"
-          className="font-bold text-brand-700 hover:text-brand-800"
-        >
+        <Link href="/register" className="font-bold text-brand-700 hover:text-brand-800">
           Create an account
         </Link>
       </p>

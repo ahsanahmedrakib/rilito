@@ -1,3 +1,5 @@
+"use client";
+
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import {
   CheckIcon,
@@ -6,27 +8,12 @@ import {
 import { ProductActions } from "@/features/product/components/ProductActions";
 import { ProductGallery } from "@/features/product/components/ProductGallery";
 import { ProductScroller } from "@/features/product/components/ProductScroller";
-import { allProducts, getCategoryBySlug, getProductBySlug } from "@/lib/data";
-import type { Review } from "@/lib/types";
+import { getCategoryBySlug } from "@/features/category/data/categories";
+import { useStore } from "@/lib/store";
+import type { Product } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
-import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const product = getProductBySlug(slug);
-  if (!product) return { title: "Product not found — Rilito" };
-  return {
-    title: `${product.name} — Rilito`,
-    description: product.description,
-    openGraph: { images: [product.images[0]] },
-  };
-}
+import { useParams, notFound } from "next/navigation";
 
 const sampleNames = [
   "Kazi Mahi",
@@ -55,7 +42,7 @@ const sampleBodies = [
   "Worth every taka. This is my third item from Rilito and they stay consistent.",
 ];
 
-function seededReviews(product: (typeof allProducts)[0]): Review[] {
+function seededReviews(product: Product) {
   const count = Math.min(6, (product.reviewCount % 6) + 3);
   return Array.from({ length: count }).map((_, i) => {
     const seed = (product.id.charCodeAt(2) + i * 7) % sampleNames.length;
@@ -73,13 +60,7 @@ function seededReviews(product: (typeof allProducts)[0]): Review[] {
   });
 }
 
-function Stars({
-  rating,
-  size = "h-4 w-4",
-}: {
-  rating: number;
-  size?: string;
-}) {
+function Stars({ rating, size = "h-4 w-4" }: { rating: number; size?: string }) {
   return (
     <span className="flex text-amber-500">
       {Array.from({ length: 5 }).map((_, i) => (
@@ -92,20 +73,17 @@ function Stars({
   );
 }
 
-export default async function ProductPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const product = getProductBySlug(slug);
+export default function ProductPage() {
+  const { slug } = useParams<{ slug: string }>();
+  const { products } = useStore();
+  const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
 
   const category = getCategoryBySlug(product.category);
-  const related = allProducts
+  const related = products
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 10);
-  const fallback = allProducts.filter((p) => p.id !== product.id).slice(0, 10);
+  const fallback = products.filter((p) => p.id !== product.id).slice(0, 10);
   const relatedProducts = related.length ? related : fallback;
 
   const reviews = seededReviews(product);
@@ -137,8 +115,7 @@ export default async function ProductPage({
           <div className="mt-3 flex items-center gap-3">
             <Stars rating={product.rating} />
             <span className="text-sm text-ink-500">
-              {product.rating.toFixed(1)} · Based on {product.reviewCount}{" "}
-              reviews
+              {product.rating.toFixed(1)} · Based on {product.reviewCount} reviews
             </span>
           </div>
           <p className="mt-5 text-sm leading-relaxed text-ink-600 md:text-base">
@@ -157,10 +134,7 @@ export default async function ProductPage({
           </h2>
           <ul className="mt-5 space-y-3">
             {product.details.map((d) => (
-              <li
-                key={d}
-                className="flex items-start gap-3 text-sm text-ink-700"
-              >
+              <li key={d} className="flex items-start gap-3 text-sm text-ink-700">
                 <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-600 text-white">
                   <CheckIcon className="h-3 w-3" />
                 </span>
@@ -171,9 +145,7 @@ export default async function ProductPage({
           <div className="mt-6 grid grid-cols-3 gap-3 border-t border-ink-100 pt-6 text-center">
             <div>
               <p className="text-xs text-ink-500">Fabric Care</p>
-              <p className="mt-1 text-xs font-bold text-ink-900">
-                Machine wash
-              </p>
+              <p className="mt-1 text-xs font-bold text-ink-900">Machine wash</p>
             </div>
             <div>
               <p className="text-xs text-ink-500">Origin</p>
@@ -181,9 +153,7 @@ export default async function ProductPage({
             </div>
             <div>
               <p className="text-xs text-ink-500">SKU</p>
-              <p className="mt-1 text-xs font-bold text-ink-900">
-                {product.id}
-              </p>
+              <p className="mt-1 text-xs font-bold text-ink-900">{product.id}</p>
             </div>
           </div>
         </div>
@@ -194,9 +164,7 @@ export default async function ProductPage({
               Reviews
             </h2>
             <div className="flex items-center gap-2 rounded-full bg-ink-950 px-4 py-2 text-white">
-              <span className="text-lg font-black">
-                {product.rating.toFixed(1)}
-              </span>
+              <span className="text-lg font-black">{product.rating.toFixed(1)}</span>
               <Stars rating={stars} size="h-3.5 w-3.5" />
             </div>
           </div>
@@ -219,12 +187,8 @@ export default async function ProductPage({
                     </span>
                   )}
                 </div>
-                <p className="mt-2 text-sm font-semibold text-ink-800">
-                  {r.title}
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-ink-600">
-                  {r.body}
-                </p>
+                <p className="mt-2 text-sm font-semibold text-ink-800">{r.title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink-600">{r.body}</p>
               </div>
             ))}
           </div>

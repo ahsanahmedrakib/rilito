@@ -10,18 +10,17 @@ import {
 } from "@/components/shared/components/icons";
 import {
   FREE_SHIPPING_THRESHOLD,
-  PROMO_CODE,
-  PROMO_DISCOUNT_PERCENT,
   SHIPPING_FEE,
 } from "@/features/cart/data/shipping";
 import { useStore } from "@/lib/store";
+import { discountForCoupon } from "@/lib/coupons";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function CartPage() {
-  const { cart, updateQty, removeFromCart, cartSubtotal, cartCount, toast } =
+  const { cart, updateQty, removeFromCart, cartSubtotal, cartCount, coupons, toast } =
     useStore();
   const [promo, setPromo] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -33,11 +32,12 @@ export default function CartPage() {
   const total = cartSubtotal - discount + shipping;
 
   const applyPromo = () => {
-    if (promo.trim().toUpperCase() === PROMO_CODE) {
-      setDiscount(Math.round(cartSubtotal * (PROMO_DISCOUNT_PERCENT / 100)));
-      toast("Coupon applied", "10% off (code RILITO10)");
+    const value = discountForCoupon(coupons, promo, cartSubtotal);
+    if (value > 0) {
+      setDiscount(value);
+      toast("Coupon applied", `${promo.trim().toUpperCase()} — ${formatPrice(value)} off`);
     } else {
-      toast("Invalid coupon", "Try RILITO10 for 10% off", "info");
+      toast("Invalid coupon", "Try a different code", "info");
     }
   };
 
@@ -147,7 +147,7 @@ export default function CartPage() {
             <input
               value={promo}
               onChange={(e) => setPromo(e.target.value)}
-              placeholder="Coupon code (try RILITO10)"
+              placeholder="Coupon code"
               className="flex-1 rounded-xl border border-ink-200 px-4 py-2.5 text-sm outline-none focus:border-ink-950"
             />
             <button
@@ -165,7 +165,7 @@ export default function CartPage() {
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-emerald-700">
-                <dt>Discount (RILITO10)</dt>
+                <dt>Discount {promo.trim() && `(${promo.trim().toUpperCase()})`}</dt>
                 <dd className="font-semibold">-{formatPrice(discount)}</dd>
               </div>
             )}
