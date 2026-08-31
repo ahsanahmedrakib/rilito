@@ -6,7 +6,9 @@ import {
   buildProduct,
   colorsToText,
   generateSku,
+  parseSizeStocks,
   productSchema,
+  sizeStocksToText,
   splitLines,
   textToColors,
   type ProductValues,
@@ -17,10 +19,13 @@ import { CheckIcon } from "@/components/shared/components/icons";
 import type { ColorOption, Product } from "@/lib/types";
 import { ColorListEditor } from "./ColorListEditor";
 import { ImageManager } from "./ImageManager";
+import { ImageUploader } from "./ImageUploader";
 
 const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-ink-400 focus:border-ink-950";
 const labelCls = "mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600";
+
+const SIZE_PRESETS = ["S", "M", "L", "XL", "XXL", "XXXL"];
 
 function toFormValues(product?: Product, products: Product[] = []): ProductValues {
   if (!product) {
@@ -34,8 +39,10 @@ function toFormValues(product?: Product, products: Product[] = []): ProductValue
       description: "",
       details: "",
       sizes: "S\nM\nL\nXL\nXXL",
+      sizeStocks: "S=0\nM=0\nL=0\nXL=0\nXXL=0",
+      sizeGuideImage: "",
       images: "",
-      colors: "Black #111318\nWhite #f4f4f4",
+      colors: "Black #111318",
       features: false,
       isBestSeller: false,
       isNew: true,
@@ -51,6 +58,12 @@ function toFormValues(product?: Product, products: Product[] = []): ProductValue
     description: product.description,
     details: product.details.join("\n"),
     sizes: product.sizes.join("\n"),
+    sizeStocks: sizeStocksToText(
+      product.sizeStock && Object.keys(product.sizeStock).length > 0
+        ? product.sizeStock
+        : { [product.sizes[0]]: product.stock }
+    ),
+    sizeGuideImage: product.sizeGuideImage ?? "",
     images: product.images.join("\n"),
     colors: colorsToText(product.colors),
     features: Boolean(product.featured),
@@ -89,6 +102,36 @@ export function ProductForm({
   const colorOptions = textToColors(watch("colors"));
   const setColorOptions = (arr: ColorOption[]) =>
     setValue("colors", colorsToText(arr), { shouldValidate: true });
+
+  const selectedSizes = splitLines(watch("sizes"));
+  const sizeStockMap = parseSizeStocks(watch("sizeStocks"));
+  const totalSizeStock = selectedSizes.reduce(
+    (sum, s) => sum + (sizeStockMap[s] ?? 0),
+    0
+  );
+
+  const toggleSize = (size: string) => {
+    const next = selectedSizes.includes(size)
+      ? selectedSizes.filter((s) => s !== size)
+      : [...selectedSizes, size];
+    setValue("sizes", next.join("\n"), { shouldValidate: true });
+    setValue(
+      "sizeStocks",
+      sizeStocksToText({
+        ...sizeStockMap,
+        [size]: selectedSizes.includes(size) ? 0 : sizeStockMap[size] ?? 0,
+      }),
+      { shouldValidate: true }
+    );
+  };
+
+  const setSizeStock = (size: string, count: number) => {
+    setValue(
+      "sizeStocks",
+      sizeStocksToText({ ...sizeStockMap, [size]: count }),
+      { shouldValidate: true }
+    );
+  };
 
   const submit = (values: ProductValues) => {
     onSubmit(buildProduct(values, products, product));
@@ -150,7 +193,7 @@ export function ProductForm({
           </select>
           {fieldError("category")}
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelCls}>Price *</label>
             <input className={cn(inputCls, errors.price && "border-red-400")} {...register("price")} />
@@ -161,11 +204,17 @@ export function ProductForm({
             <input className={cn(inputCls, errors.salePrice && "border-red-400")} {...register("salePrice")} />
             {fieldError("salePrice")}
           </div>
-          <div>
-            <label className={labelCls}>Stock *</label>
-            <input className={cn(inputCls, errors.stock && "border-red-400")} {...register("stock")} />
-            {fieldError("stock")}
-          </div>
+        </div>
+        <div>
+          <label className={labelCls}>Total Stock</label>
+          <input
+            readOnly
+            value={totalSizeStock}
+            className={cn(inputCls, "bg-ink-50 font-bold text-ink-950")}
+          />
+          <p className="mt-1.5 text-xs text-ink-400">
+            Auto-calculated as the sum of per-size stock below.
+          </p>
         </div>
         <div className="sm:col-span-2">
           <label className={labelCls}>Description *</label>
@@ -181,10 +230,76 @@ export function ProductForm({
           <textarea rows={4} className={cn(inputCls, "resize-none")} {...register("details")} />
         </div>
         <div>
-          <label className={labelCls}>Sizes (one per line) *</label>
-          <textarea rows={4} className={cn(inputCls, "resize-none", errors.sizes && "border-red-400")} {...register("sizes")} />
+          <label className={labelCls}>Sizes (multi-select) *</label>
+          <div className="flex flex-wrap gap-2">
+            {SIZE_PRESETS.map((s) => {
+              const active = selectedSizes.includes(s);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => toggleSize(s)}
+                  className={cn(
+                    "rounded-xl border px-4 py-2 text-sm font-semibold transition",
+                    active
+                      ? "border-ink-950 bg-ink-950 text-white"
+                      : "border-ink-200 bg-white text-ink-800 hover:border-ink-950"
+                  )}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-3 flex gap-2">
+            <input
+              id="custom-size"
+              placeholder="Custom size (e.g. 28, 40)"
+              className={cn(inputCls, "py-2.5")}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const input = document.getElementById("custom-size") as HTMLInputElement | null;
+                const val = input?.value.trim();
+                if (val && !selectedSizes.includes(val)) {
+                  toggleSize(val);
+                  if (input) input.value = "";
+                }
+              }}
+              className="shrink-0 rounded-xl border border-ink-200 px-4 py-2 text-sm font-bold text-ink-800 transition hover:border-ink-950"
+            >
+              Add
+            </button>
+          </div>
           {fieldError("sizes")}
         </div>
+        {selectedSizes.length > 0 && (
+          <div className="sm:col-span-2">
+            <label className={labelCls}>Stock per size *</label>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {selectedSizes.map((s) => (
+                <div key={s} className="flex items-center gap-2 rounded-xl border border-ink-200 px-3 py-2">
+                  <span className="min-w-[32px] text-sm font-bold text-ink-900">{s}</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={Number.isInteger(sizeStockMap[s]) ? sizeStockMap[s] : 0}
+                    onChange={(e) => setSizeStock(s, Math.max(0, parseInt(e.target.value || "0", 10)))}
+                    className="w-full bg-transparent text-right outline-none"
+                    aria-label={`Stock for size ${s}`}
+                  />
+                </div>
+              ))}
+            </div>
+            <p className={cn("mt-1.5 text-xs", totalSizeStock !== 0 ? "text-ink-400" : "text-amber-600")}>
+              {totalSizeStock > 0
+                ? `Total stock: ${totalSizeStock}`
+                : "Set stock for each size. Total stock is shown in the Total Stock field."}
+            </p>
+            {fieldError("sizeStocks")}
+          </div>
+        )}
         <div className="sm:col-span-2">
           <div className="mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-ink-600">
             <span>Product images *</span>
@@ -199,6 +314,14 @@ export function ProductForm({
             The first image is the card image and main slider image. You can add
             up to {10} images for the single product slider.
           </p>
+        </div>
+        <div className="sm:col-span-2">
+          <ImageUploader
+            value={watch("sizeGuideImage") ?? ""}
+            onChange={(v) => setValue("sizeGuideImage", v, { shouldValidate: true })}
+            label="Size guide image"
+            hint="Upload a size chart image (optional). Shown in the product page 'View size guide' popup."
+          />
         </div>
         <div className="sm:col-span-2">
           <ColorListEditor

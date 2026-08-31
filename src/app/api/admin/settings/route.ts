@@ -31,12 +31,22 @@ export async function PATCH(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
-    const keys = ["qrImage", "paymentNumber", "paymentNote"];
-    for (const key of keys) {
+    const keys: { key: string; isArray: boolean }[] = [
+      { key: "qrImage", isArray: false },
+      { key: "paymentNumber", isArray: false },
+      { key: "paymentNote", isArray: false },
+      { key: "marqueeTexts", isArray: true },
+    ];
+    for (const { key, isArray } of keys) {
       if (body[key] !== undefined) {
+        const value = isArray
+          ? Array.isArray(body[key])
+            ? body[key]
+            : [body[key]]
+          : String(body[key]);
         await Setting.updateOne(
           { key },
-          { $set: { value: String(body[key]) } },
+          { $set: { value } },
           { upsert: true }
         ).exec();
       }

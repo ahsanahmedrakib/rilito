@@ -27,7 +27,11 @@ export function Header() {
     setMobileOpen,
     user,
     categories,
+    settings,
   } = useStore();
+  const marqueeTexts = settings.marqueeTexts?.length
+    ? settings.marqueeTexts
+    : ["FREE DELIVERY ON ORDERS OVER ৳2,000", "CASH ON DELIVERY ACROSS BANGLADESH"];
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [showCat, setShowCat] = useState(false);
@@ -64,14 +68,12 @@ export function Header() {
               key={dup}
               className="flex items-center gap-10 text-xs font-medium tracking-wide"
             >
-              <span>FREE DELIVERY ON ORDERS OVER ৳2,000</span>
-              <span className="text-brand-400">✦</span>
-              <span>FLAT 40% OFF SELECTED STYLES — SALE NOW LIVE</span>
-              <span className="text-brand-400">✦</span>
-              <span>CASH ON DELIVERY ACROSS BANGLADESH</span>
-              <span className="text-brand-400">✦</span>
-              <span>7-DAY EASY EXCHANGE ON ALL ORDERS</span>
-              <span className="text-brand-400">✦</span>
+              {marqueeTexts.map((t, i) => (
+                <span key={i} className="flex items-center gap-10">
+                  <span>{t}</span>
+                  <span className="text-brand-400">✦</span>
+                </span>
+              ))}
             </div>
           ))}
         </div>

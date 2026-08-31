@@ -3,7 +3,19 @@ import type mongoose from "mongoose";
 import { categories as seedCategories, allProducts } from "@/lib/data";
 import { defaultCoupons } from "@/lib/coupons";
 
-const SETTING_KEYS = ["qrImage", "paymentNumber", "paymentNote"] as const;
+const SETTING_KEYS = ["qrImage", "paymentNumber", "paymentNote", "marqueeTexts"] as const;
+
+const SETTING_DEFAULTS: Record<(typeof SETTING_KEYS)[number], unknown> = {
+  qrImage: "",
+  paymentNumber: "01611-773755",
+  paymentNote: "Send to this number and keep the transaction ID.",
+  marqueeTexts: [
+    "FREE DELIVERY ON ORDERS OVER ৳2,000",
+    "FLAT 40% OFF SELECTED STYLES — SALE NOW LIVE",
+    "CASH ON DELIVERY ACROSS BANGLADESH",
+    "7-DAY EASY EXCHANGE ON ALL ORDERS",
+  ],
+};
 
 /** Seed defaults only when collections are empty. Safe to call repeatedly. */
 export async function seedCollections(): Promise<void> {
@@ -45,11 +57,6 @@ export async function seedCollections(): Promise<void> {
   }
 
   for (const key of SETTING_KEYS) {
-    const defaults: Record<string, string> = {
-      qrImage: "",
-      paymentNumber: "01611-773755",
-      paymentNote: "Send to this number and keep the transaction ID.",
-    };
     const existing = await Setting.findOne({ key }).exec();
     if (
       key === "paymentNumber" &&
@@ -62,7 +69,8 @@ export async function seedCollections(): Promise<void> {
     } else if (!existing) {
       await Setting.create({
         key,
-        value: (defaults[key] ?? "") as unknown as mongoose.Schema.Types.Mixed,
+        value:
+          SETTING_DEFAULTS[key] as unknown as mongoose.Schema.Types.Mixed,
       });
     }
   }
@@ -93,10 +101,18 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
 }
 
 export async function readSettings() {
-  const [qrImage, paymentNumber, paymentNote] = await Promise.all([
-    getSetting<string>("qrImage", ""),
-    getSetting<string>("paymentNumber", "01611-773755"),
-    getSetting<string>("paymentNote", "Send to this number and keep the transaction ID."),
-  ]);
-  return { qrImage, paymentNumber, paymentNote };
+  const [qrImage, paymentNumber, paymentNote, marqueeTexts] =
+    await Promise.all([
+      getSetting<string>("qrImage", ""),
+      getSetting<string>("paymentNumber", "01611-773755"),
+      getSetting<string>(
+        "paymentNote",
+        "Send to this number and keep the transaction ID."
+      ),
+      getSetting<string[]>(
+        "marqueeTexts",
+        SETTING_DEFAULTS.marqueeTexts as string[]
+      ),
+    ]);
+  return { qrImage, paymentNumber, paymentNote, marqueeTexts };
 }

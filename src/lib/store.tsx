@@ -153,6 +153,12 @@ const defaultSettings: AppSettings = {
   qrImage: "",
   paymentNumber: "01611-773755",
   paymentNote: "Send to this number and keep the transaction ID.",
+  marqueeTexts: [
+    "FREE DELIVERY ON ORDERS OVER ৳2,000",
+    "FLAT 40% OFF SELECTED STYLES — SALE NOW LIVE",
+    "CASH ON DELIVERY ACROSS BANGLADESH",
+    "7-DAY EASY EXCHANGE ON ALL ORDERS",
+  ],
 };
 
 export function StoreProvider({ children }: { children: ReactNode }) {

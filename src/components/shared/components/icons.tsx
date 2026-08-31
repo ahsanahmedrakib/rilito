@@ -21,6 +21,21 @@ function make(pathOrChildren: React.ReactNode) {
   };
 }
 
+function makeFilled(pathOrChildren: React.ReactNode) {
+  return function Icon(props: IconProps) {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+        {...props}
+      >
+        {pathOrChildren}
+      </svg>
+    );
+  };
+}
+
 export const CartIcon = make(
   <>
     <path d="M6 6h15l-1.5 9h-12z" />
@@ -194,26 +209,23 @@ export const TagIcon = make(
   </>
 );
 
-export const FacebookIcon = make(
+export const FacebookIcon = makeFilled(
   <path d="M14 8h3V4.5h-3c-2.5 0-4 1.8-4 4.2V11H7v3.5h3V21h3.5v-6.5h2.7l.5-3.5h-3.2V9c0-.6.3-1 .7-1z" />
 );
-export const InstagramIcon = make(
+export const InstagramIcon = makeFilled(
   <>
-    <rect x="3" y="3" width="18" height="18" rx="5" />
-    <circle cx="12" cy="12" r="4" />
-    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" />
+    <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth={1.8} />
+    <circle cx="17.5" cy="6.5" r="1.5" />
   </>
 );
-export const WhatsAppIcon = make(
-  <path d="M12 3a9 9 0 0 1 7.6 13.6l1.3 4-4.1-1.3A9 9 0 1 1 12 3zm0 2a7 7 0 1 0 3.4 13.1l.9-.5 1.7.5-.5-1.6.4-.9A7 7 0 0 0 12 5zm-3.2 4.3c.2 2 3.3 5.6 5.4 6 .1.7-.3 1.2-1 1.6-1 .4-2.9-.7-3.9-1.9-1.2-1.4-2-3.2-1-4.3.4-.5 1-.7 1.5-.5v1.1c-.3.1-.6.3-.7.6-.2.3.3.8.8 1.3.6.6 1.6 1.4 2.2 1.1.4-.2.5-.8.5-1.2.3-.2.8-.1 1.3.2.4.5 1.4 1.4 1.5 1.7 0 .2-.2.5-.3.7-.4.6-1 .9-1.7.5-2.2-1-4-2.9-5.1-4.8-.4-.7-.4-1.4-.1-2 .2-.3.5-.5.8-.5z" />
+export const WhatsAppIcon = makeFilled(
+  <path d="M12.04 2C6.47 2 2 6.48 2 12.06c0 1.77.46 3.5 1.34 5.02L2 22l5.08-1.31a9.98 9.98 0 0 0 4.96 1.27h.01c5.58 0 10.05-4.48 10.05-10.06A9.99 9.99 0 0 0 12.04 2zm5.84 14.18c-.24.68-1.4 1.31-1.93 1.35-.53.05-1.02.24-3.46-.72-2.94-1.15-4.82-4.14-4.97-4.33-.14-.19-1.18-1.57-1.18-3 0-1.43.75-2.13 1.01-2.42.26-.29.57-.36.76-.36h.55c.18 0 .42-.06.65.5.24.57.81 2 .88 2.14.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.17-.3.38-.42.51-.14.14-.29.29-.12.57.17.29.75 1.24 1.61 2.01 1.11.99 2.04 1.3 2.33 1.44.29.14.46.12.63-.07.17-.19.73-.85.92-1.14.19-.29.38-.24.64-.14.26.09 1.66.78 1.94.92.29.14.48.21.55.33.07.12.07.67-.16 1.34z" />
 );
-export const TikTokIcon = make(
+export const TikTokIcon = makeFilled(
   <path d="M16.6 4c.4 2.1 1.8 3.5 3.9 3.9v2.8c-1.5 0-2.8-.5-3.9-1.2v5.4c0 3.6-2.5 6.1-6 6.1-3.4 0-5.9-2.5-5.9-5.8 0-3.3 2.8-5.9 6.3-5.4v3c-1.9-.5-3.5.8-3.4 2.6 0 1.6 1.2 2.7 2.8 2.7 1.5 0 2.7-1.1 2.7-2.8V4h2.5z" />
 );
-export const TikTikIcon = make(
-  <path d="M16.6 4c.4 2.1 1.8 3.5 3.9 3.9v2.8c-1.5 0-2.8-.5-3.9-1.2v5.4c0 3.6-2.5 6.1-6 6.1-3.4 0-5.9-2.5-5.9-5.8 0-3.3 2.8-5.9 6.3-5.4v3c-1.9-.5-3.5.8-3.4 2.6 0 1.6 1.2 2.7 2.8 2.7 1.5 0 2.7-1.1 2.7-2.8V4h2.5z" />
-);
-export const YoutubeIcon = make(
+export const YoutubeIcon = makeFilled(
   <path d="M21.5 8a3 3 0 0 0-2.1-2.1C17.5 5.4 12 5.4 12 5.4s-5.5 0-7.4.5A3 3 0 0 0 2.5 8a32 32 0 0 0 0 8 3 3 0 0 0 2.1 2.1c1.9.5 7.4.5 7.4.5s5.5 0 7.4-.5a3 3 0 0 0 2.1-2.1 32 32 0 0 0 0-8zM10 15V9l5 3z" />
 );
 

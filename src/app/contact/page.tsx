@@ -12,7 +12,7 @@ import { ContactForm } from "@/features/contact/components/ContactForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact Us — Rilito",
+  title: "Contact Us",
   description:
     "Get in touch with the Rilito team for orders, deliveries, exchanges and questions.",
 };

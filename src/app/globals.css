@@ -136,6 +136,22 @@ body {
   animation: logo-breathe 1.4s ease-in-out infinite;
 }
 
+@keyframes logo-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scale(0.92);
+  }
+}
+
+.animate-logo-pulse {
+  animation: logo-pulse 1.6s ease-in-out infinite;
+}
+
 .swiper {
   z-index: 0;
 }

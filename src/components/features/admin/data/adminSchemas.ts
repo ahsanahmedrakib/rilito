@@ -67,6 +67,19 @@ export const productSchema = yup.object({
     .test("sizes", "Enter at least one size (e.g. S, M, L)", (value) =>
       splitLines(value).length > 0
     ),
+  sizeStocks: yup
+    .string()
+    .test(
+      "sizeStocks",
+      "Enter stock for each selected size (e.g. S=10, M=15)",
+      (value, ctx) => {
+        const sizes = splitLines((ctx.parent as { sizes?: string }).sizes);
+        if (sizes.length === 0) return true;
+        const map = parseSizeStocks(value);
+        return sizes.every((s) => Number.isInteger(map[s]) && map[s] >= 0);
+      }
+    ),
+  sizeGuideImage: yup.string(),
   images: yup
     .string()
     .test("images", "Add at least one image (upload or URL)", (value) => {
@@ -114,6 +127,30 @@ export function textToColors(value: string | undefined): ColorOption[] {
   });
 }
 
+export function parseSizeStocks(
+  value: string | undefined
+): Record<string, number> {
+  const map: Record<string, number> = {};
+  for (const line of splitLines(value)) {
+    const idx = line.indexOf("=");
+    if (idx > 0) {
+      const k = line.slice(0, idx).trim();
+      const n = parseInt(line.slice(idx + 1).trim(), 10);
+      map[k] = Number.isNaN(n) ? 0 : n;
+    }
+  }
+  return map;
+}
+
+export function sizeStocksToText(
+  map: Record<string, number> | undefined
+): string {
+  if (!map) return "";
+  return Object.entries(map)
+    .map(([k, v]) => `${k}=${v}`)
+    .join("\n");
+}
+
 export function nextProductId(products: Product[]): string {
   const max = products.reduce((m, p) => {
     const n = parseInt(p.id.replace(/\D/g, ""), 10);
@@ -123,10 +160,9 @@ export function nextProductId(products: Product[]): string {
 }
 
 export function generateSku(products: Product[], date = new Date()): string {
-  const ymd = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}${String(date.getDate()).padStart(2, "0")}`;
+  const ymd = `${String(date.getFullYear()).slice(-2)}${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
   const prefix = `RIL-${ymd}`;
   let serial = 0;
   for (const p of products) {
@@ -144,6 +180,9 @@ export function buildProduct(
   existing?: Product
 ): Product {
   const productId = existing?.id ?? nextProductId(products);
+  const sizes = splitLines(values.sizes);
+  const sizeStock = parseSizeStocks(values.sizeStocks);
+  const totalStock = sizes.reduce((sum, s) => sum + (sizeStock[s] ?? 0), 0);
   return {
     id: productId,
     slug: slugify(values.name),
@@ -152,11 +191,13 @@ export function buildProduct(
     category: values.category,
     price: Number(values.price),
     salePrice: values.salePrice !== undefined ? Number(values.salePrice) : undefined,
-    stock: Number(values.stock),
+    stock: totalStock,
+    sizeStock,
+    sizeGuideImage: values.sizeGuideImage?.trim() || undefined,
     images: splitLines(values.images),
     description: values.description.trim(),
     details: splitLines(values.details),
-    sizes: splitLines(values.sizes),
+    sizes,
     colors: textToColors(values.colors),
     tags: [values.category, ...values.name.toLowerCase().split(/\s+/)],
     rating: existing?.rating ?? 0,

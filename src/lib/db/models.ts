@@ -115,6 +115,8 @@ export interface ProductDoc {
   details: string[];
   sizes: string[];
   colors: { name: string; hex: string }[];
+  sizeStock?: Record<string, number>;
+  sizeGuideImage?: string;
   tags: string[];
   rating: number;
   reviewCount: number;
@@ -139,6 +141,8 @@ const ProductSchema = new Schema<ProductDoc>(
     details: { type: [String], default: [] },
     sizes: { type: [String], default: [] },
     colors: { type: [{ name: String, hex: String }], default: [] },
+    sizeStock: { type: Schema.Types.Mixed, default: {} },
+    sizeGuideImage: { type: String, default: "" },
     tags: { type: [String], default: [] },
     rating: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },

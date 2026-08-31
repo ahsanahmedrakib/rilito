@@ -33,3 +33,19 @@ export function formatDate(date: string): string {
 export function currentPrice(product: Product): number {
   return product.salePrice ?? product.price;
 }
+
+/**
+ * Returns the stock available for each size. For legacy products without
+ * per-size stock records, the total `stock` is assigned to the first size so
+ * availability still works.
+ */
+export function sizeStockMap(product: Product): Record<string, number> {
+  if (product.sizeStock && Object.keys(product.sizeStock).length > 0) {
+    return product.sizeStock;
+  }
+  const map: Record<string, number> = {};
+  if (product.sizes.length > 0) {
+    map[product.sizes[0]] = product.stock;
+  }
+  return map;
+}

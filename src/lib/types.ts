@@ -29,6 +29,10 @@ export interface Product {
   details: string[];
   sizes: string[];
   colors: ColorOption[];
+  /** Stock per size label. Total `stock` should equal the sum of these values. */
+  sizeStock?: Record<string, number>;
+  /** Optional size-guide chart image shown in the "View size guide" popup. */
+  sizeGuideImage?: string;
   tags: string[];
   rating: number;
   reviewCount: number;
@@ -114,6 +118,8 @@ export interface AppSettings {
   qrImage: string;
   paymentNumber: string;
   paymentNote: string;
+  /** Announcement marquee messages shown above the navbar. */
+  marqueeTexts: string[];
 }
 
 export interface ContactQuery {

@@ -10,14 +10,19 @@ import {
 } from "@/components/shared/components/icons";
 import { useStore } from "@/lib/store";
 import type { Product } from "@/lib/types";
-import { cn, discountPercent, formatPrice } from "@/lib/utils";
+import { cn, discountPercent, formatPrice, sizeStockMap } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SizeGuideLink } from "./SizeGuideModal";
 
 export function ProductActions({ product }: { product: Product }) {
   const { addToCart, isWishlisted, toggleWishlist, toast } = useStore();
   const router = useRouter();
-  const [size, setSize] = useState(product.sizes[1] ?? product.sizes[0]);
+  const stockBySize = sizeStockMap(product);
+  const defaultSize =
+    product.sizes.find((s) => (stockBySize[s] ?? 0) > 0) ??
+    product.sizes[0];
+  const [size, setSize] = useState(defaultSize);
   const [color, setColor] = useState(product.colors[0].name);
   const [qty, setQty] = useState(1);
 
@@ -25,7 +30,9 @@ export function ProductActions({ product }: { product: Product }) {
   const onSale = !!product.salePrice;
   const price = product.salePrice ?? product.price;
   const lowStock = product.stock <= 20 && product.stock > 0;
-  const outOfStock = product.stock <= 0;
+  const outOfStock = product.stock <= 0 || (size ? (stockBySize[size] ?? 0) <= 0 : false);
+  const sizeAvailable = size ? (stockBySize[size] ?? 0) > 0 : false;
+  const maxQty = Math.max(1, stockBySize[size] ?? product.stock);
 
   const handleAdd = () => {
     addToCart(product, size, color, qty);
@@ -92,24 +99,27 @@ export function ProductActions({ product }: { product: Product }) {
           Size
         </p>
         <div className="mt-2.5 flex flex-wrap gap-2">
-          {product.sizes.map((s) => (
-            <button
-              key={s}
-              onClick={() => setSize(s)}
-              className={cn(
-                "min-w-[52px] rounded-xl border px-4 py-2.5 text-sm font-semibold transition",
-                size === s
-                  ? "border-ink-950 bg-ink-950 text-white"
-                  : "border-ink-200 bg-white text-ink-800 hover:border-ink-950",
-              )}
-            >
-              {s}
-            </button>
-          ))}
+          {product.sizes.map((s) => {
+            const noStock = (stockBySize[s] ?? 0) <= 0;
+            return (
+              <button
+                key={s}
+                onClick={() => setSize(s)}
+                disabled={noStock}
+                className={cn(
+                  "min-w-[52px] rounded-xl border px-4 py-2.5 text-sm font-semibold transition",
+                  noStock && "cursor-not-allowed border-ink-100 text-ink-300 line-through",
+                  !noStock && size === s
+                    ? "border-ink-950 bg-ink-950 text-white"
+                    : !noStock && "border-ink-200 bg-white text-ink-800 hover:border-ink-950",
+                )}
+              >
+                {s}
+              </button>
+            );
+          })}
         </div>
-        <button className="mt-2 text-xs font-semibold text-brand-700 underline-offset-2 hover:underline">
-          View size guide
-        </button>
+        <SizeGuideLink product={product} /> 
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -124,7 +134,7 @@ export function ProductActions({ product }: { product: Product }) {
           </button>
           <span className="w-10 text-center text-base font-bold">{qty}</span>
           <button
-            onClick={() => setQty((v) => Math.min(product.stock || 1, v + 1))}
+            onClick={() => setQty((v) => Math.min(maxQty, v + 1))}
             disabled={outOfStock}
             className="grid h-12 w-12 place-items-center text-ink-700 hover:text-ink-950 disabled:opacity-40"
             aria-label="Increase quantity"
@@ -183,12 +193,12 @@ export function ProductActions({ product }: { product: Product }) {
 
       {outOfStock ? (
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
-          This item is currently unavailable — it will be back in stock soon.
+          {sizeAvailable ? "Out of stock" : `Size ${size} is out of stock — please pick another size.`}
         </p>
       ) : (
         lowStock && (
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-            Only {product.stock} left in stock — order soon
+            Only {stockBySize[size] ?? product.stock} left in size {size} — order soon
           </p>
         )
       )}
