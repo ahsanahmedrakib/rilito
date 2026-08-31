@@ -76,6 +76,16 @@ function readLS<T>(key: string, fallback: T): T {
   }
 }
 
+function toPublicUser(user: User & { password: string }): User {
+  return {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    address: user.address,
+    city: user.city,
+  };
+}
+
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -97,19 +107,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setCart(readLS("rilito-cart", []));
     setWishlist(readLS("rilito-wishlist", []));
     setOrders(readLS("rilito-orders", []));
-    const storedProducts = readLS<Product[] | null>("rilito-products", null);
-    if (storedProducts && storedProducts.length > 0) setProducts(storedProducts);
+    setProducts(readLS("rilito-products", allProducts));
     setCoupons(readLS("rilito-coupons", defaultCoupons()));
     setIsAdmin(readLS("rilito-admin", false));
     const session = readLS<{ email: string } | null>("rilito-session", null);
-    if (session) {
-      const users = readLS<Array<User & { password: string }>>("rilito-users", []);
-      const match = users.find((u) => u.email === session.email);
-      if (match) {
-        const { password: _pw, ...rest } = match;
-        setUser(rest);
-      }
-    }
+    const users = readLS<Array<User & { password: string }>>("rilito-users", []);
+    const currentUser = session
+      ? (users.find((u) => u.email === session.email) ?? null)
+      : null;
+    setUser(currentUser ? toPublicUser(currentUser) : null);
     setReady(true);
   }, []);
 
@@ -129,12 +135,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [orders]);
 
   useEffect(() => {
-    if (hydrated.current) return;
+    if (!hydrated.current) return;
     localStorage.setItem("rilito-products", JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    if (hydrated.current) return;
+    if (!hydrated.current) return;
     localStorage.setItem("rilito-coupons", JSON.stringify(coupons));
   }, [coupons]);
 
@@ -217,8 +223,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (users.some((u) => u.email === data.email)) return false;
       const next = [...users, data];
       localStorage.setItem("rilito-users", JSON.stringify(next));
-      const { password: _pw, ...rest } = data;
-      setUser(rest);
+      setUser(toPublicUser(data));
       localStorage.setItem("rilito-session", JSON.stringify({ email: data.email }));
       return true;
     },
@@ -229,8 +234,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const users = readLS<Array<User & { password: string }>>("rilito-users", []);
     const match = users.find((u) => u.email === email && u.password === password);
     if (!match) return false;
-    const { password: _pw, ...rest } = match;
-    setUser(rest);
+    setUser(toPublicUser(match));
     localStorage.setItem("rilito-session", JSON.stringify({ email }));
     return true;
   }, []);

@@ -5,7 +5,7 @@ import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 const nav = [
   { href: "/admin", label: "Dashboard" },
@@ -18,18 +18,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const { ready, isAdmin, logoutAdmin, toast } = useStore();
   const router = useRouter();
   const pathname = usePathname();
-  const [readyToRoute, setReadyToRoute] = useState(false);
 
   useEffect(() => {
     if (!ready || isAdmin) return;
-    router.replace("/admin/login");
-  }, [ready, isAdmin, router]);
+    if (pathname !== "/admin/login") router.replace("/admin/login");
+  }, [ready, isAdmin, pathname, router]);
 
-  useEffect(() => {
-    if (ready) setReadyToRoute(true);
-  }, [ready]);
-
-  if (!readyToRoute || !isAdmin) {
+  if (!ready) {
     return (
       <div className="grid min-h-[80vh] place-items-center text-sm text-ink-500">
         Checking access...
@@ -37,7 +32,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
     );
   }
 
-  if (pathname === "/admin/login") return null;
+  if (pathname === "/admin/login") return <>{children}</>;
+
+  if (!isAdmin) {
+    return (
+      <div className="grid min-h-[80vh] place-items-center text-sm text-ink-500">
+        Checking access...
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-7xl px-4 py-8 md:px-6 lg:px-8">
