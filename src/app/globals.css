@@ -112,6 +112,30 @@ body {
   animation: scale-in 0.25s ease both;
 }
 
+@keyframes logo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-logo-spin {
+  animation: logo-spin 0.9s linear infinite;
+}
+
+@keyframes logo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.animate-logo-breathe {
+  animation: logo-breathe 1.4s ease-in-out infinite;
+}
+
 .swiper {
   z-index: 0;
 }

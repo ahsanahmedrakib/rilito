@@ -65,8 +65,8 @@ export default function CheckoutPage() {
 
   const place = handleSubmit((values: CheckoutAddress) => {
     setPlacing(true);
-    setTimeout(() => {
-      const order = placeOrder({
+    setTimeout(async () => {
+      const order = await placeOrder({
         items: cart,
         subtotal: cartSubtotal,
         shipping,

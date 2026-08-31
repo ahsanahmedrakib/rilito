@@ -14,7 +14,7 @@ const inputCls =
 export function AdminLoginForm({
   onLogin,
 }: {
-  onLogin: (email: string, password: string) => boolean;
+  onLogin: (email: string, password: string) => Promise<boolean>;
 }) {
   const {
     register,
@@ -26,11 +26,11 @@ export function AdminLoginForm({
     defaultValues: { email: "", password: "" },
   });
 
-  const submit = (values: AdminLoginValues) => {
-    const ok = onLogin(values.email, values.password);
+  const submit = async (values: AdminLoginValues) => {
+    const ok = await onLogin(values.email, values.password);
     if (!ok) {
       setError("root", {
-        message: "Invalid admin credentials. Try admin@rilito.com / admin123",
+        message: "Invalid admin credentials.",
       });
     }
   };

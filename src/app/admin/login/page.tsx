@@ -16,8 +16,8 @@ export default function AdminLoginPage() {
   return (
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-12">
       <AdminLoginForm
-        onLogin={(email, password) => {
-          const ok = loginAdmin(email, password);
+        onLogin={async (email, password) => {
+          const ok = await loginAdmin(email, password);
           if (ok) {
             toast("Welcome, admin", "Signed in to the dashboard");
             router.push("/admin");

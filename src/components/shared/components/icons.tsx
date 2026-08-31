@@ -225,26 +225,18 @@ export const LogoutIcon = make(
   </>
 );
 
-export const LogoMark = (props: IconProps) => (
-  <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" {...props}>
-    <rect x="2" y="2" width="28" height="28" rx="8" fill="currentColor" />
-    <path
-      d="M9 20.5c3-1 3-8 0-9"
-      stroke="#fff"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-    />
-    <path
-      d="M15.5 21c3-1.3 3-8.7 0-10"
-      stroke="#fff"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-    />
-    <path
-      d="M22 20.5c2.6-1 2.6-8 0-9"
-      stroke="#fff"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-    />
-  </svg>
+export const LogoMark = ({
+  className,
+  src = "/logo.png",
+}: {
+  className?: string;
+  src?: string;
+}) => (
+  <img
+    src={src}
+    alt="Rilito"
+    aria-hidden="true"
+    loading="lazy"
+    className={className}
+  />
 );

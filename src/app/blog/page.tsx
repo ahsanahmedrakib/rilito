@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Style Journal — Rilito",
   description:
     "Style guides, menswear trends and fabric tips from the Rilito style desk.",
+  alternates: { canonical: "/blog" },
 };
 
 export default function BlogIndexPage() {

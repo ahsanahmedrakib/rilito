@@ -10,10 +10,20 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  if (slug === "faq") return { title: "FAQ — Rilito" };
+  if (slug === "faq")
+    return {
+      title: "FAQ — Rilito",
+      description: "Answers to common questions about Rilito orders, sizing, delivery and returns.",
+      alternates: { canonical: `/pages/faq` },
+    };
   const page = pageContents[slug];
   if (!page) return { title: "Page not found — Rilito" };
-  return { title: `${page.title} — Rilito` };
+  return {
+    title: page.title,
+    description:
+      page.sections[0]?.body[0] ?? "Learn more about Rilito — modern menswear for Bangladesh.",
+    alternates: { canonical: `/pages/${slug}` },
+  };
 }
 
 export default async function Page({

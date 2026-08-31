@@ -25,8 +25,9 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
-  const submit = (values: LoginValues) => {
-    if (!login(values.email.trim(), values.password)) {
+  const submit = async (values: LoginValues) => {
+    const ok = await login(values.email.trim(), values.password);
+    if (!ok) {
       setError("root", {
         message: "No account matches that email and password.",
       });

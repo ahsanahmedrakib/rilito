@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ArrowRight } from "@/components/shared/components/icons";
+import { SITE_URL } from "@/components/shared/data/site";
 import { blogPosts } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 import type { Metadata } from "next";
@@ -16,8 +17,25 @@ export async function generateMetadata({
   const post = blogPosts.find((p) => p.slug === slug);
   if (!post) return { title: "Post not found — Rilito" };
   return {
-    title: `${post.title} — Rilito`,
+    title: post.title,
     description: post.excerpt,
+    alternates: { canonical: `/blog/${post.slug}` },
+    openGraph: {
+      type: "article",
+      url: `${SITE_URL}/blog/${post.slug}`,
+      title: `${post.title} — Rilito`,
+      description: post.excerpt,
+      images: [{ url: post.image, alt: post.title }],
+      publishedTime: new Date(post.date).toISOString(),
+      authors: [post.author],
+      section: post.category,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image],
+    },
   };
 }
 

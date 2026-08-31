@@ -1,6 +1,7 @@
 "use client";
 
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
+import { ProductJsonLd } from "@/features/product/components/ProductJsonLd";
 import {
   CheckIcon,
   StarFilledIcon,
@@ -50,6 +51,18 @@ export default function ProductPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
+      <ProductJsonLd
+        name={product.name}
+        slug={product.slug}
+        sku={product.sku}
+        image={product.images[0]}
+        description={product.description}
+        price={product.price}
+        salePrice={product.salePrice}
+        category={category?.name}
+        rating={reviews.length ? product.rating : undefined}
+        reviewCount={reviews.length}
+      />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },

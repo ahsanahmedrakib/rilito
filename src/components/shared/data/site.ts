@@ -1,4 +1,7 @@
 export const WEBSITE_NAME = "Rilito";
+export const SITE_URL =
+  (process.env.NEXT_PUBLIC_SITE_URL as string | undefined)?.replace(/\/$/, "") ??
+  "https://rilito.com";
 export const HOTLINE = "01979-394059";
 export const HOTLINE_LINK = "tel:01979394059";
 export const FACEBOOK_URL =

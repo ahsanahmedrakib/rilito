@@ -34,8 +34,8 @@ export function RegisterForm() {
     },
   });
 
-  const submit = (values: RegisterValues) => {
-    const ok = registerUser({
+  const submit = async (values: RegisterValues) => {
+    const ok = await registerUser({
       name: values.name.trim(),
       phone: values.phone.trim(),
       email: values.email ?? "",
