@@ -131,9 +131,15 @@ export default function OrderPage() {
         <p className="mt-4 text-xs text-ink-500">
           Current status:{" "}
           <span className="font-bold text-brand-700">{order.status}</span>.
-          We're preparing your parcel — you'll get an SMS with the courier
-          tracking ID once it ships.
+          {order.tracking?.trackingId
+            ? ` Courier: ${order.tracking.courier || "—"} · Tracking ID: ${order.tracking.trackingId}.`
+            : " We're preparing your parcel — you'll get an SMS with the courier tracking ID once it ships."}
         </p>
+        {order.tracking?.note && (
+          <p className="mt-2 rounded-xl bg-ink-50 px-4 py-3 text-xs text-ink-600">
+            {order.tracking.note}
+          </p>
+        )}
       </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">

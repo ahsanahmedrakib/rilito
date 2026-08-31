@@ -73,7 +73,7 @@ export default function AdminDashboardPage() {
           </div>
           {recentOrders.length === 0 ? (
             <p className="mt-6 rounded-2xl bg-ink-50 py-10 text-center text-sm text-ink-500">
-              No orders yet — they'll appear here once customers check out.
+              No orders yet &mdash; they&apos;ll appear here once customers check out.
             </p>
           ) : (
             <ul className="mt-4 divide-y divide-ink-100">

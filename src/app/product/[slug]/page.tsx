@@ -8,57 +8,13 @@ import {
 import { ProductActions } from "@/features/product/components/ProductActions";
 import { ProductGallery } from "@/features/product/components/ProductGallery";
 import { ProductScroller } from "@/features/product/components/ProductScroller";
+import { ReviewModal } from "@/features/product/components/ReviewModal";
 import { getCategoryBySlug } from "@/features/category/data/categories";
 import { useStore } from "@/lib/store";
-import type { Product } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { useParams, notFound } from "next/navigation";
-
-const sampleNames = [
-  "Kazi Mahi",
-  "Rafi Ahmed",
-  "Ayon Hossain",
-  "Shadman Sakib",
-  "Jubayer Khan",
-  "Mehedi Hasan",
-  "Zihan Rahman",
-  "Fahim Chowdhury",
-];
-const sampleTitles = [
-  "Exactly as pictured",
-  "Great quality for the price",
-  "Beautiful fabric, spot-on fit",
-  "Orders here regularly",
-  "Better than expected",
-  "Sizing guide was perfect",
-];
-const sampleBodies = [
-  "The quality genuinely surprised me. Stitching is clean, the fabric feels premium, and delivery was faster than promised.",
-  "I compared a few options before buying and this remains the best choice. Ordered a second one in another colour.",
-  "Fits exactly as the description said. Went with the size I normally wear and the silhouette is exactly what I wanted.",
-  "Packaging was neat and the COD inspection saved me the worry. Customer service on WhatsApp answered in minutes.",
-  "Already washing it a few times and there's no fading or shrinking. Colour is true to the photos.",
-  "Worth every taka. This is my third item from Rilito and they stay consistent.",
-];
-
-function seededReviews(product: Product) {
-  const count = Math.min(6, (product.reviewCount % 6) + 3);
-  return Array.from({ length: count }).map((_, i) => {
-    const seed = (product.id.charCodeAt(2) + i * 7) % sampleNames.length;
-    const daysAgo = 3 + ((i * 13 + seed) % 90);
-    const date = new Date(Date.now() - daysAgo * 86400000).toISOString();
-    return {
-      id: `${product.id}-r${i}`,
-      author: sampleNames[(seed + i) % sampleNames.length],
-      rating: product.rating - (i % 2 === 0 ? 0 : 0.2),
-      title: sampleTitles[(seed + i * 2) % sampleTitles.length],
-      body: sampleBodies[(seed + i * 3) % sampleBodies.length],
-      date,
-      verified: i !== count - 1,
-    };
-  });
-}
+import { useState } from "react";
 
 function Stars({ rating, size = "h-4 w-4" }: { rating: number; size?: string }) {
   return (
@@ -75,7 +31,8 @@ function Stars({ rating, size = "h-4 w-4" }: { rating: number; size?: string }) 
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { products } = useStore();
+  const { products, reviews: allReviews } = useStore();
+  const [reviewOpen, setReviewOpen] = useState(false);
   const product = products.find((p) => p.slug === slug);
   if (!product) notFound();
 
@@ -86,7 +43,9 @@ export default function ProductPage() {
   const fallback = products.filter((p) => p.id !== product.id).slice(0, 10);
   const relatedProducts = related.length ? related : fallback;
 
-  const reviews = seededReviews(product);
+  const reviews = allReviews.filter(
+    (r) => r.productId === product.id && r.status === "approved"
+  );
   const stars = Math.round(product.rating);
 
   return (
@@ -153,47 +112,63 @@ export default function ProductPage() {
             </div>
             <div>
               <p className="text-xs text-ink-500">SKU</p>
-              <p className="mt-1 text-xs font-bold text-ink-900">{product.id}</p>
+              <p className="mt-1 text-xs font-bold text-ink-900">{product.sku}</p>
             </div>
           </div>
         </div>
 
         <div className="rounded-3xl bg-white p-6 ring-1 ring-ink-200/60 md:p-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-extrabold uppercase tracking-tight text-ink-950">
               Reviews
             </h2>
-            <div className="flex items-center gap-2 rounded-full bg-ink-950 px-4 py-2 text-white">
-              <span className="text-lg font-black">{product.rating.toFixed(1)}</span>
-              <Stars rating={stars} size="h-3.5 w-3.5" />
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 rounded-full bg-ink-950 px-4 py-2 text-white">
+                <span className="text-lg font-black">{product.rating.toFixed(1)}</span>
+                <Stars rating={stars} size="h-3.5 w-3.5" />
+              </div>
+              <button
+                onClick={() => setReviewOpen(true)}
+                className="rounded-full bg-brand-600 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
+              >
+                Give Review
+              </button>
             </div>
           </div>
 
           <div className="mt-6 space-y-6">
-            {reviews.map((r) => (
-              <div
-                key={r.id}
-                className="border-b border-ink-100 pb-6 last:border-0 last:pb-0"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-bold text-ink-950">{r.author}</p>
-                  <p className="text-xs text-ink-400">{formatDate(r.date)}</p>
+            {reviews.length === 0 ? (
+              <p className="rounded-2xl bg-ink-50 py-10 text-center text-sm text-ink-500">
+                No reviews yet — be the first to review this product.
+              </p>
+            ) : (
+              reviews.map((r) => (
+                <div
+                  key={r.id}
+                  className="border-b border-ink-100 pb-6 last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold text-ink-950">{r.author}</p>
+                    <p className="text-xs text-ink-400">{formatDate(r.date)}</p>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <Stars rating={r.rating} size="h-3.5 w-3.5" />
+                    {r.verified && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                        <CheckIcon className="h-3 w-3" /> Verified
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-2 text-sm font-semibold text-ink-800">{r.title}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-ink-600">{r.body}</p>
                 </div>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <Stars rating={r.rating} size="h-3.5 w-3.5" />
-                  {r.verified && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
-                      <CheckIcon className="h-3 w-3" /> Verified
-                    </span>
-                  )}
-                </div>
-                <p className="mt-2 text-sm font-semibold text-ink-800">{r.title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-ink-600">{r.body}</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
+
+      <ReviewModal product={product} open={reviewOpen} onClose={() => setReviewOpen(false)} />
 
       <section className="mt-16">
         <div className="flex items-end justify-between">

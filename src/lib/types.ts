@@ -5,17 +5,21 @@ export interface ColorOption {
 
 export interface Review {
   id: string;
+  productId: string;
+  productName: string;
   author: string;
   rating: number;
   title: string;
   body: string;
   date: string;
   verified: boolean;
+  status: "pending" | "approved" | "rejected";
 }
 
 export interface Product {
   id: string;
   slug: string;
+  sku: string;
   name: string;
   category: string;
   price: number;
@@ -32,6 +36,7 @@ export interface Product {
   isBestSeller?: boolean;
   isNew?: boolean;
   featured?: boolean;
+  deleted?: boolean;
   reviews: Review[];
 }
 
@@ -83,6 +88,11 @@ export interface Order {
   payment: string;
   status: string;
   date: string;
+  tracking?: {
+    courier: string;
+    trackingId: string;
+    note: string;
+  };
 }
 
 export interface User {
@@ -98,4 +108,10 @@ export interface Coupon {
   type: "percent" | "fixed";
   value: number;
   active: boolean;
+}
+
+export interface AppSettings {
+  qrImage: string;
+  paymentNumber: string;
+  paymentNote: string;
 }

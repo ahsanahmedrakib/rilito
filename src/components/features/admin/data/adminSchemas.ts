@@ -31,9 +31,15 @@ export type CouponValues = yup.InferType<typeof couponSchema>;
 
 const numberLine = /^[A-Za-z][A-Za-z ]*#[0-9a-fA-F]{6}$/;
 const urlLine = /^https?:\/\/\S+$/;
+const dataUrlLine = /^data:image\/[a-zA-Z+]+;base64,/;
 
 export const productSchema = yup.object({
   name: yup.string().required("Name is required").min(2, "At least 2 characters"),
+  sku: yup
+    .string()
+    .required("SKU is required")
+    .min(3, "At least 3 characters")
+    .matches(/^[A-Z0-9-]+$/i, "Use letters, numbers and dashes only"),
   category: yup.string().required("Category is required"),
   price: yup
     .number()
@@ -63,9 +69,12 @@ export const productSchema = yup.object({
     ),
   images: yup
     .string()
-    .test("images", "Enter at least one valid image URL per line", (value) => {
+    .test("images", "Add at least one image (upload or URL)", (value) => {
       const lines = splitLines(value);
-      return lines.length > 0 && lines.every((l) => urlLine.test(l));
+      return (
+        lines.length > 0 &&
+        lines.every((l) => urlLine.test(l) || dataUrlLine.test(l))
+      );
     }),
   colors: yup
     .string()
@@ -113,6 +122,22 @@ export function nextProductId(products: Product[]): string {
   return `p-${String(max + 1).padStart(3, "0")}`;
 }
 
+export function generateSku(products: Product[], date = new Date()): string {
+  const ymd = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}${String(date.getDate()).padStart(2, "0")}`;
+  const prefix = `RIL-${ymd}`;
+  let serial = 0;
+  for (const p of products) {
+    const match = new RegExp(`^${prefix}-(\\d+)$`).exec(
+      (p.sku ?? "").trim().toUpperCase()
+    );
+    if (match) serial = Math.max(serial, Number(match[1]));
+  }
+  return `${prefix}-${String(serial + 1).padStart(3, "0")}`;
+}
+
 export function buildProduct(
   values: ProductValues,
   products: Product[],
@@ -122,6 +147,7 @@ export function buildProduct(
   return {
     id: productId,
     slug: slugify(values.name),
+    sku: values.sku.trim().toUpperCase(),
     name: values.name.trim(),
     category: values.category,
     price: Number(values.price),

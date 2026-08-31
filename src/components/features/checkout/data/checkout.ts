@@ -33,7 +33,7 @@ export const deliveryMethods: DeliveryMethod[] = [
   },
 ];
 
-export type PaymentMethodId = "cod" | "bkash" | "nagad";
+export type PaymentMethodId = "cod" | "qr";
 
 export interface PaymentMethod {
   id: PaymentMethodId;
@@ -43,8 +43,7 @@ export interface PaymentMethod {
 
 export const paymentMethods: PaymentMethod[] = [
   { id: "cod", title: "Cash on Delivery", description: "Pay when you receive" },
-  { id: "bkash", title: "bKash", description: "Send to 01979-394059" },
-  { id: "nagad", title: "Nagad", description: "Send to 01979-394059" },
+  { id: "qr", title: "QR Payment", description: "Scan & pay with any app" },
 ];
 
 export { FREE_SHIPPING_THRESHOLD };

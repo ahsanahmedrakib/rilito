@@ -10,7 +10,11 @@ import { useEffect, type ReactNode } from "react";
 const nav = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/track-order", label: "Track Order" },
+  { href: "/admin/categories", label: "Categories" },
   { href: "/admin/products", label: "Products" },
+  { href: "/admin/deleted-data", label: "Deleted data" },
+  { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/coupons", label: "Coupons" },
 ];
 

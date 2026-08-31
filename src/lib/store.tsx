@@ -10,10 +10,19 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { CartItem, Coupon, Order, Product, User } from "./types";
+import type {
+  AppSettings,
+  CartItem,
+  Category,
+  Coupon,
+  Order,
+  Product,
+  Review,
+  User,
+} from "./types";
 import { generateOrderId } from "@/features/order/data/status";
 import { defaultCoupons } from "./coupons";
-import { allProducts } from "./data";
+import { allProducts, categories as defaultCategories } from "./data";
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "admin@rilito.com";
 const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD ?? "admin123";
@@ -52,14 +61,30 @@ interface StoreContextValue {
   loginAdmin: (email: string, password: string) => boolean;
   logoutAdmin: () => void;
   products: Product[];
+  deletedProducts: Product[];
   saveProduct: (product: Product) => void;
   deleteProduct: (id: string) => void;
+  restoreProduct: (id: string) => void;
+  permanentlyDeleteProduct: (id: string) => void;
+  isSkuTaken: (sku: string, excludeId?: string) => boolean;
+  categories: Category[];
+  saveCategory: (category: Category) => void;
+  deleteCategory: (slug: string) => boolean;
+  reviews: Review[];
+  submitReview: (review: Review) => void;
+  setReviewStatus: (id: string, status: Review["status"]) => void;
+  settings: AppSettings;
+  saveSettings: (patch: Partial<AppSettings>) => void;
   coupons: Coupon[];
   saveCoupon: (coupon: Coupon) => void;
   deleteCoupon: (code: string) => void;
   orders: Order[];
   placeOrder: (order: Omit<Order, "id" | "date" | "status" | "total">) => Order;
   updateOrderStatus: (id: string, status: string) => void;
+  updateOrderTracking: (
+    id: string,
+    tracking: { courier: string; trackingId: string; note: string }
+  ) => void;
   toast: (title: string, description?: string, variant?: Toast["variant"]) => void;
   toasts: Toast[];
 }
@@ -93,6 +118,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>(allProducts);
   const [coupons, setCoupons] = useState<Coupon[]>(defaultCoupons);
+  const [categories, setCategories] = useState<Category[]>(defaultCategories);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [settings, setSettings] = useState<AppSettings>({
+    qrImage: "",
+    paymentNumber: "01979-394059",
+    paymentNote: "Send to this number and keep the transaction ID.",
+  });
   const [isAdmin, setIsAdmin] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -109,6 +141,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setOrders(readLS("rilito-orders", []));
     setProducts(readLS("rilito-products", allProducts));
     setCoupons(readLS("rilito-coupons", defaultCoupons()));
+    setCategories(readLS("rilito-categories", defaultCategories));
+    setReviews(readLS("rilito-reviews", []));
+    setSettings({
+      qrImage: "",
+      paymentNumber: "01979-394059",
+      paymentNote: "Send to this number and keep the transaction ID.",
+      ...readLS<Partial<AppSettings>>("rilito-settings", {}),
+    });
     setIsAdmin(readLS("rilito-admin", false));
     const session = readLS<{ email: string } | null>("rilito-session", null);
     const users = readLS<Array<User & { password: string }>>("rilito-users", []);
@@ -143,6 +183,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!hydrated.current) return;
     localStorage.setItem("rilito-coupons", JSON.stringify(coupons));
   }, [coupons]);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    localStorage.setItem("rilito-categories", JSON.stringify(categories));
+  }, [categories]);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    localStorage.setItem("rilito-reviews", JSON.stringify(reviews));
+  }, [reviews]);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    localStorage.setItem("rilito-settings", JSON.stringify(settings));
+  }, [settings]);
 
   const toast = useCallback(
     (title: string, description?: string, variant: Toast["variant"] = "success") => {
@@ -283,7 +338,65 @@ const loginAdmin = useCallback((email: string, password: string) => {
   }, []);
 
   const deleteProduct = useCallback((id: string) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, deleted: true } : p))
+    );
+  }, []);
+
+  const restoreProduct = useCallback((id: string) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, deleted: false } : p))
+    );
+  }, []);
+
+  const permanentlyDeleteProduct = useCallback((id: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
+  const isSkuTaken = useCallback(
+    (sku: string, excludeId?: string) => {
+      const normalized = sku.trim().toUpperCase();
+      return products.some(
+        (p) => p.sku.trim().toUpperCase() === normalized && p.id !== excludeId
+      );
+    },
+    [products]
+  );
+
+  const saveCategory = useCallback((category: Category) => {
+    setCategories((prev) => {
+      const exists = prev.some((c) => c.slug === category.slug);
+      return exists
+        ? prev.map((c) => (c.slug === category.slug ? category : c))
+        : [...prev, category];
+    });
+  }, []);
+
+  const deleteCategory = useCallback(
+    (slug: string) => {
+      const inUse = products.some((p) => p.category === slug && !p.deleted);
+      if (inUse) return false;
+      setCategories((prev) => prev.filter((c) => c.slug !== slug));
+      return true;
+    },
+    [products]
+  );
+
+  const submitReview = useCallback((review: Review) => {
+    setReviews((prev) => [...prev, review]);
+  }, []);
+
+  const setReviewStatus = useCallback(
+    (id: string, status: Review["status"]) => {
+      setReviews((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status } : r))
+      );
+    },
+    []
+  );
+
+  const saveSettings = useCallback((patch: Partial<AppSettings>) => {
+    setSettings((prev) => ({ ...prev, ...patch }));
   }, []);
 
   const saveCoupon = useCallback((coupon: Coupon) => {
@@ -318,6 +431,24 @@ const loginAdmin = useCallback((email: string, password: string) => {
     setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
   }, []);
 
+  const updateOrderTracking = useCallback(
+    (id: string, tracking: { courier: string; trackingId: string; note: string }) => {
+      setOrders((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, tracking } : o))
+      );
+    },
+    []
+  );
+
+  const deletedProducts = useMemo(
+    () => products.filter((p) => p.deleted),
+    [products]
+  );
+  const activeProducts = useMemo(
+    () => products.filter((p) => !p.deleted),
+    [products]
+  );
+
   const value: StoreContextValue = {
     ready,
     cart,
@@ -344,15 +475,28 @@ const loginAdmin = useCallback((email: string, password: string) => {
     isAdmin,
     loginAdmin,
     logoutAdmin,
-    products,
+    products: activeProducts,
+    deletedProducts,
     saveProduct,
     deleteProduct,
+    restoreProduct,
+    permanentlyDeleteProduct,
+    isSkuTaken,
+    categories,
+    saveCategory,
+    deleteCategory,
+    reviews,
+    submitReview,
+    setReviewStatus,
+    settings,
+    saveSettings,
     coupons,
     saveCoupon,
     deleteCoupon,
     orders,
     placeOrder,
     updateOrderStatus,
+    updateOrderTracking,
     toast,
     toasts,
   };

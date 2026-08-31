@@ -3,7 +3,6 @@
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ArrowRight } from "@/components/shared/components/icons";
 import { ProductCard } from "@/features/product/components/ProductCard";
-import { getCategoryBySlug } from "@/features/category/data/categories";
 import { useStore } from "@/lib/store";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,9 +10,12 @@ import { useParams } from "next/navigation";
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { products } = useStore();
-  const category = getCategoryBySlug(slug);
+  const { products, categories } = useStore();
+  const category = categories.find((c) => c.slug === slug);
   const categoryProducts = products.filter((p) => p.category === slug);
+  const accent = /^#[0-9a-fA-F]{6}$/.test(category?.accent ?? "")
+    ? category!.accent
+    : null;
 
   if (!category) {
     return (
@@ -42,6 +44,12 @@ export default function CategoryPage() {
           className="object-cover opacity-50"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-ink-950/20" />
+        {accent && (
+          <div
+            className="absolute inset-x-0 bottom-0 h-3/4"
+            style={{ background: `linear-gradient(to top, ${accent}, transparent)` }}
+          />
+        )}
         <div className="relative mx-auto flex h-full max-w-7xl flex-col justify-end px-4 pb-10 md:px-6 lg:px-8">
           <Breadcrumbs
             items={[

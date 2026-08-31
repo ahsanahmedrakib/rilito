@@ -10,7 +10,6 @@ import {
 import { PriceRangeFilter } from "@/features/product/components/PriceRangeFilter";
 import { ProductCard } from "@/features/product/components/ProductCard";
 import { SortSelect } from "@/features/product/components/SortSelect";
-import { categories } from "@/features/category/data/categories";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/lib/types";
@@ -41,7 +40,7 @@ function getSort(sort: string) {
 }
 
 function ProductsBrowser() {
-  const { products } = useStore();
+  const { products, categories } = useStore();
   const searchParams = useSearchParams();
 
   const category = searchParams.get("category") ?? "";

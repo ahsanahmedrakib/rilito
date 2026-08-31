@@ -9,76 +9,77 @@ export const categories: Category[] = [
     name: "T-Shirt",
     tagline: "Daily essentials with a bold print",
     image: img("1523381210434-271e8be1f52b"),
-    accent: "from-ink-900 to-ink-700",
+    accent: "#18181b",
   },
   {
     slug: "panjabi",
     name: "Panjabi",
     tagline: "Elegant wear for every occasion",
     image: img("1506629082955-511b1aa562c8"),
-    accent: "from-brand-800 to-brand-600",
+    accent: "#0f766e",
   },
   {
     slug: "shirts",
     name: "Shirt",
     tagline: "Crisp fits from desk to dinner",
     image: img("1591047139829-d91aecb6caea"),
-    accent: "from-sky-800 to-sky-600",
+    accent: "#0369a1",
   },
   {
     slug: "pants",
     name: "Pants",
     tagline: "Everyday bottoms that hold their shape",
     image: img("1542272604-787c3835535d"),
-    accent: "from-amber-800 to-amber-600",
+    accent: "#b45309",
   },
   {
     slug: "winter",
     name: "Winter Fashion",
     tagline: "Stay warm without losing the style",
     image: img("1434389677669-e08b4cac3105"),
-    accent: "from-slate-800 to-slate-600",
+    accent: "#334155",
   },
   {
     slug: "footwear",
     name: "Footwear",
     tagline: "Step out in comfort and confidence",
     image: img("1523275335684-37898b6baf30"),
-    accent: "from-stone-800 to-stone-600",
+    accent: "#44403c",
   },
   {
     slug: "accessories",
     name: "Accessories",
     tagline: "The finishing touches that complete you",
     image: img("1495385794356-15371f348c31"),
-    accent: "from-zinc-800 to-zinc-600",
+    accent: "#3f3f46",
   },
   {
     slug: "active",
     name: "Active Wear",
     tagline: "Train hard, look sharp",
     image: img("1556905055-8f358a7a47b2"),
-    accent: "from-emerald-800 to-emerald-600",
+    accent: "#047857",
   },
   {
     slug: "combo",
     name: "Combo Pack",
     tagline: "Curated sets, smarter prices",
     image: img("1490481651871-ab68de25d43d"),
-    accent: "from-fuchsia-800 to-fuchsia-600",
+    accent: "#a21caf",
   },
   {
     slug: "blazer",
     name: "Blazer",
     tagline: "Sharp shoulder lines for big moments",
     image: img("1552374196-c4e7ffc6e126"),
-    accent: "from-indigo-900 to-indigo-700",
+    accent: "#3730a3",
   },
 ];
 
 export const allProducts: Product[] = [
   {
     id: "p-001",
+    sku: "RIL-P001",
     slug: "oversized-graphic-tee-noir",
     name: "Oversized Graphic Tee Noir",
     category: "t-shirts",
@@ -105,6 +106,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-002",
+    sku: "RIL-P002",
     slug: "essential-crew-neck-tee",
     name: "Essential Crew Neck Tee",
     category: "t-shirts",
@@ -129,6 +131,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-003",
+    sku: "RIL-P003",
     slug: "striped-polo-rib-tee",
     name: "Striped Polo Rib Tee",
     category: "t-shirts",
@@ -154,6 +157,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-004",
+    sku: "RIL-P004",
     slug: "heavy-cotton-street-tee",
     name: "Heavy Cotton Street Tee",
     category: "t-shirts",
@@ -177,6 +181,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-005",
+    sku: "RIL-P005",
     slug: "boxy-logo-tee-white",
     name: "Boxy Logo Tee White",
     category: "t-shirts",
@@ -195,6 +200,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-006",
+    sku: "RIL-P006",
     slug: "rinse-denim-shirt",
     name: "Rinse Wash Denim Shirt",
     category: "shirts",
@@ -215,6 +221,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-007",
+    sku: "RIL-P007",
     slug: "oxford-business-shirt",
     name: "Oxford Business Shirt",
     category: "shirts",
@@ -238,6 +245,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-008",
+    sku: "RIL-P008",
     slug: "linen-casual-shirt-sand",
     name: "Linen Casual Shirt Sand",
     category: "shirts",
@@ -262,6 +270,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-009",
+    sku: "RIL-P009",
     slug: "classic-cotton-panjabi",
     name: "Classic Cotton Panjabi",
     category: "panjabi",
@@ -286,6 +295,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-010",
+    sku: "RIL-P010",
     slug: "embroidered-silk-panjabi",
     name: "Embroidered Silk Panjabi",
     category: "panjabi",
@@ -310,6 +320,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-011",
+    sku: "RIL-P011",
     slug: "katkono-semi-stiched-panjabi",
     name: "Katkono Semi Stitched Panjabi",
     category: "panjabi",
@@ -332,6 +343,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-012",
+    sku: "RIL-P012",
     slug: "thin-stripe-wedding-panjabi",
     name: "Thin Stripe Wedding Panjabi",
     category: "panjabi",
@@ -355,6 +367,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-013",
+    sku: "RIL-P013",
     slug: "classic-slim-fit-jeans",
     name: "Classic Slim Fit Jeans",
     category: "pants",
@@ -376,6 +389,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-014",
+    sku: "RIL-P014",
     slug: "multi-pocket-cargo-pants",
     name: "Multi-Pocket Cargo Pants",
     category: "pants",
@@ -399,6 +413,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-015",
+    sku: "RIL-P015",
     slug: "pleated-chino-trousers",
     name: "Pleated Chino Trousers",
     category: "pants",
@@ -424,6 +439,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-016",
+    sku: "RIL-P016",
     slug: "tapered-jogger-pant",
     name: "Tapered Jogger Pant",
     category: "pants",
@@ -446,6 +462,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-017",
+    sku: "RIL-P017",
     slug: "washed-black-straight-jeans",
     name: "Washed Black Straight Jeans",
     category: "pants",
@@ -466,6 +483,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-018",
+    sku: "RIL-P018",
     slug: "quilted-bomber-jacket",
     name: "Quilted Bomber Jacket",
     category: "winter",
@@ -491,6 +509,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-019",
+    sku: "RIL-P019",
     slug: "hooded-puffer-jacket",
     name: "Hooded Puffer Jacket",
     category: "winter",
@@ -516,6 +535,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-020",
+    sku: "RIL-P020",
     slug: "fine-knit-sweater",
     name: "Fine Knit Crew Sweater",
     category: "winter",
@@ -541,6 +561,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-021",
+    sku: "RIL-P021",
     slug: "varsity-letter-jacket",
     name: "Varsity Letter Jacket",
     category: "winter",
@@ -564,6 +585,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-022",
+    sku: "RIL-P022",
     slug: "oversized-heathered-hoodie",
     name: "Oversized Heathered Hoodie",
     category: "winter",
@@ -589,6 +611,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-023",
+    sku: "RIL-P023",
     slug: "graphic-print-hoodie",
     name: "Graphic Print Hoodie",
     category: "winter",
@@ -607,6 +630,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-024",
+    sku: "RIL-P024",
     slug: "leather-derby-shoes",
     name: "Leather Derby Shoes",
     category: "footwear",
@@ -628,6 +652,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-025",
+    sku: "RIL-P025",
     slug: "low-top-canvas-sneakers",
     name: "Low Top Canvas Sneakers",
     category: "footwear",
@@ -653,6 +678,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-026",
+    sku: "RIL-P026",
     slug: "retro-running-sneaker",
     name: "Retro Running Sneaker",
     category: "footwear",
@@ -678,6 +704,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-027",
+    sku: "RIL-P027",
     slug: "suede-loafer-slippers",
     name: "Suede Loafer Slippers",
     category: "footwear",
@@ -701,6 +728,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-028",
+    sku: "RIL-P028",
     slug: "dry-fit-gym-tee",
     name: "Dry-Fit Gym Tee",
     category: "active",
@@ -724,6 +752,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-029",
+    sku: "RIL-P029",
     slug: "training-track-pants",
     name: "Training Track Pants",
     category: "active",
@@ -747,6 +776,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-030",
+    sku: "RIL-P030",
     slug: "sports-jogging-shorts",
     name: "Sports Jogging Shorts",
     category: "active",
@@ -767,6 +797,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-031",
+    sku: "RIL-P031",
     slug: "genuine-leather-belt",
     name: "Genuine Leather Belt",
     category: "accessories",
@@ -790,6 +821,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-032",
+    sku: "RIL-P032",
     slug: "weekender-duffle-bag",
     name: "Weekender Duffle Bag",
     category: "accessories",
@@ -815,6 +847,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-033",
+    sku: "RIL-P033",
     slug: "analog-watch-olive",
     name: "Analog Watch Olive",
     category: "accessories",
@@ -837,6 +870,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-034",
+    sku: "RIL-P034",
     slug: "pack-of-3-socks",
     name: "Pack of 3 Breathable Socks",
     category: "accessories",
@@ -857,6 +891,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-035",
+    sku: "RIL-P035",
     slug: "slouch-beanie-cap",
     name: "Slouch Beanie Cap",
     category: "accessories",
@@ -881,6 +916,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-036",
+    sku: "RIL-P036",
     slug: "slim-fit-black-blazer",
     name: "Slim Fit Black Blazer",
     category: "blazer",
@@ -901,6 +937,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-037",
+    sku: "RIL-P037",
     slug: "checker-tailored-blazer",
     name: "Checker Tailored Blazer",
     category: "blazer",
@@ -920,6 +957,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-038",
+    sku: "RIL-P038",
     slug: "tee-plus-jogger-combo",
     name: "Tee + Jogger Combo Set",
     category: "combo",
@@ -940,6 +978,7 @@ export const allProducts: Product[] = [
   },
   {
     id: "p-039",
+    sku: "RIL-P039",
     slug: "shirt-tie-office-combo",
     name: "Shirt + Tie Office Combo",
     category: "combo",

@@ -148,11 +148,27 @@ export default function TrackOrderPage() {
             })}
           </div>
 
+          {order.tracking?.trackingId && (
+            <div className="mt-6 rounded-2xl bg-ink-950 p-5 text-white">
+              <p className="text-xs uppercase tracking-widest text-ink-400">
+                Courier tracking
+              </p>
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm font-bold">
+                  {order.tracking.courier || "Courier"} ·{" "}
+                  <span className="font-mono">{order.tracking.trackingId}</span>
+                </p>
+              </div>
+              {order.tracking.note && (
+                <p className="mt-2 text-xs text-ink-300">{order.tracking.note}</p>
+              )}
+            </div>
+          )}
+
           <div className="mt-8 border-t border-ink-100 pt-6">
             <h3 className="text-sm font-extrabold uppercase tracking-wide text-ink-950">
               Items
-            </h3>
-            <ul className="mt-4 space-y-4">
+            </h3>            <ul className="mt-4 space-y-4">
               {order.items.map((item) => (
                 <li key={item.key} className="flex items-center gap-3">
                   <Image

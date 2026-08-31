@@ -11,7 +11,6 @@ import {
   UserIcon,
 } from "@/components/shared/components/icons";
 import { HOTLINE } from "@/components/shared/data/site";
-import { categories } from "@/features/category/data/categories";
 import { quickLinks } from "@/features/header/data/navigation";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -27,6 +26,7 @@ export function Header() {
     setSearchOpen,
     setMobileOpen,
     user,
+    categories,
   } = useStore();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);

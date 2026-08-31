@@ -24,7 +24,8 @@ export function ProductActions({ product }: { product: Product }) {
   const wished = isWishlisted(product.slug);
   const onSale = !!product.salePrice;
   const price = product.salePrice ?? product.price;
-  const lowStock = product.stock <= 20;
+  const lowStock = product.stock <= 20 && product.stock > 0;
+  const outOfStock = product.stock <= 0;
 
   const handleAdd = () => {
     addToCart(product, size, color, qty);
@@ -115,15 +116,17 @@ export function ProductActions({ product }: { product: Product }) {
         <div className="flex items-center rounded-xl border border-ink-200">
           <button
             onClick={() => setQty((v) => Math.max(1, v - 1))}
-            className="grid h-12 w-12 place-items-center text-ink-700 hover:text-ink-950"
+            disabled={outOfStock}
+            className="grid h-12 w-12 place-items-center text-ink-700 hover:text-ink-950 disabled:opacity-40"
             aria-label="Decrease quantity"
           >
             <MinusIcon className="h-4 w-4" />
           </button>
           <span className="w-10 text-center text-base font-bold">{qty}</span>
           <button
-            onClick={() => setQty((v) => Math.min(product.stock, v + 1))}
-            className="grid h-12 w-12 place-items-center text-ink-700 hover:text-ink-950"
+            onClick={() => setQty((v) => Math.min(product.stock || 1, v + 1))}
+            disabled={outOfStock}
+            className="grid h-12 w-12 place-items-center text-ink-700 hover:text-ink-950 disabled:opacity-40"
             aria-label="Increase quantity"
           >
             <PlusIcon className="h-4 w-4" />
@@ -131,7 +134,8 @@ export function ProductActions({ product }: { product: Product }) {
         </div>
         <button
           onClick={handleBuy}
-          className="flex-1 rounded-xl bg-brand-600 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
+          disabled={outOfStock}
+          className="flex-1 rounded-xl bg-brand-600 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-ink-200 disabled:text-ink-500"
         >
           Buy Now
         </button>
@@ -161,17 +165,32 @@ export function ProductActions({ product }: { product: Product }) {
         </button>
       </div>
 
-      <button
-        onClick={handleAdd}
-        className="w-full rounded-xl bg-ink-950 py-4 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-ink-800"
-      >
-        Add to Cart
-      </button>
+      {outOfStock ? (
+        <button
+          disabled
+          className="w-full cursor-not-allowed rounded-xl bg-ink-200 py-4 text-sm font-bold uppercase tracking-wide text-ink-500"
+        >
+          Unavailable
+        </button>
+      ) : (
+        <button
+          onClick={handleAdd}
+          className="w-full rounded-xl bg-ink-950 py-4 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-ink-800"
+        >
+          Add to Cart
+        </button>
+      )}
 
-      {lowStock && (
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-          Only {product.stock} left in stock — order soon
+      {outOfStock ? (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          This item is currently unavailable — it will be back in stock soon.
         </p>
+      ) : (
+        lowStock && (
+          <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+            Only {product.stock} left in stock — order soon
+          </p>
+        )
       )}
 
       <div className="space-y-3 rounded-2xl bg-ink-50 p-4 text-sm">

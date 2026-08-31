@@ -8,12 +8,11 @@ import {
   TikTokIcon,
 } from "@/components/shared/components/icons";
 import { socialLinks } from "@/components/shared/data/site";
-import { categories } from "@/features/category/data/categories";
 import { useStore } from "@/lib/store";
 import Link from "next/link";
 
 export function MobileMenu() {
-  const { mobileOpen, setMobileOpen } = useStore();
+  const { mobileOpen, setMobileOpen, categories } = useStore();
   if (!mobileOpen) return null;
 
   return (

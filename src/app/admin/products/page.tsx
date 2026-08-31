@@ -97,7 +97,7 @@ function AdminProductsManager() {
                 />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-ink-950">{p.name}</p>
-                  <p className="truncate font-mono text-[11px] text-ink-400">{p.id}</p>
+                  <p className="truncate font-mono text-[11px] text-ink-400">{p.sku}</p>
                 </div>
                 <span className="text-xs font-semibold text-ink-600 capitalize">
                   {p.category}
@@ -126,9 +126,13 @@ function AdminProductsManager() {
                   </Link>
                   <button
                     onClick={() => {
-                      if (confirm(`Delete "${p.name}"?`)) {
+                      if (confirm(`Move "${p.name}" to deleted data?`)) {
                         deleteProduct(p.id);
-                        toast("Product deleted", p.name, "info");
+                        toast(
+                          "Product deleted",
+                          "You can restore it from Deleted data",
+                          "info"
+                        );
                       }
                     }}
                     className="rounded-full border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 transition hover:border-red-600 hover:bg-red-50"

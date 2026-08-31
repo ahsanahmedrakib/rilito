@@ -13,12 +13,12 @@ import {
   YoutubeIcon,
 } from "@/components/shared/components/icons";
 import { HOTLINE, socialLinks } from "@/components/shared/data/site";
-import { categories } from "@/features/category/data/categories";
 import {
   companyLinks,
   paymentMethods,
   serviceLinks,
 } from "@/features/footer/data/links";
+import { useStore } from "@/lib/store";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -27,6 +27,7 @@ const company = companyLinks;
 
 export function Footer() {
   const pathname = usePathname();
+  const { categories } = useStore();
   if (pathname.startsWith("/admin")) return null;
   return (
     <footer className="mt-20 bg-ink-950 text-ink-300">

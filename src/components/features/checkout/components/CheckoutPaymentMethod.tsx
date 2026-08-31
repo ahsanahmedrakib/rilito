@@ -5,6 +5,7 @@ import {
   paymentMethods,
   type PaymentMethodId,
 } from "@/features/checkout/data/checkout";
+import { useStore } from "@/lib/store";
 import { cn, formatPrice } from "@/lib/utils";
 
 export function CheckoutPaymentMethod({
@@ -18,12 +19,14 @@ export function CheckoutPaymentMethod({
   phone: string;
   onSelect: (id: PaymentMethodId) => void;
 }) {
+  const { settings } = useStore();
+
   return (
     <section className="rounded-3xl bg-white p-6 ring-1 ring-ink-200/60 md:p-8">
       <h2 className="text-lg font-extrabold uppercase tracking-tight text-ink-950">
         3 · Payment Method
       </h2>
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {paymentMethods.map((m) => (
           <button
             key={m.id}
@@ -43,15 +46,30 @@ export function CheckoutPaymentMethod({
           </button>
         ))}
       </div>
-      {payment !== "cod" && (
-        <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-800">
-          Send <span className="font-bold">{formatPrice(total)}</span> to{" "}
-          <span className="font-bold">01979-394059</span> (
-          {payment === "bkash" ? "bKash" : "Nagad"} Personal). Your order will
-          be confirmed once payment is verified — our team will call you on{" "}
-          <span className="font-bold">{phone || "your number"}</span>.
-        </p>
+
+      {payment === "qr" && (
+        <div className="mt-4 rounded-xl bg-amber-50 p-4 text-xs leading-relaxed text-amber-800">
+          <p className="font-bold">
+            Send <span className="uppercase">{formatPrice(total)}</span> to{" "}
+            <span className="font-bold">{settings.paymentNumber || "our payment number"}</span>.
+          </p>
+          <p className="mt-1">{settings.paymentNote}</p>
+          {settings.qrImage && (
+            <div className="mt-3 inline-block rounded-2xl border border-amber-200 bg-white p-3">
+              <img
+                src={settings.qrImage}
+                alt="Payment QR code"
+                className="h-40 w-40 rounded-lg object-contain"
+              />
+            </div>
+          )}
+          <p className="mt-2">
+            Your order will be confirmed once payment is verified — our team will
+            call you on <span className="font-bold">{phone || "your number"}</span>.
+          </p>
+        </div>
       )}
+
       <p className="mt-4 flex items-center gap-2 text-xs text-ink-500">
         <LockIcon className="h-4 w-4 text-emerald-600" />
         Your information is encrypted and never shared.

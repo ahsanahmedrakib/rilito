@@ -56,6 +56,13 @@ export const CloseIcon = make(
   </>
 );
 
+export const UploadIcon = make(
+  <g>
+    <path d="M12 16V4" />
+    <path d="M7 9l5-5 5 5" />
+    <path d="M4 20h16" />
+  </g>
+);
 export const ChevronRight = make(<path d="M9 6l6 6-6 6" />);
 export const ChevronLeft = make(<path d="M15 6l-6 6 6 6" />);
 export const ArrowRight = make(

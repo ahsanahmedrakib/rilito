@@ -1,7 +1,7 @@
 import { SectionHeading } from "@/components/shared/components/SectionHeading";
 import { ArrowRight } from "@/components/shared/components/icons";
 import { getCategoryBySlug } from "@/features/category/data/categories";
-import { productsByCategory } from "@/features/product/data/products";
+import { allProducts } from "@/lib/data";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,7 +15,7 @@ export function CategorySpotlight({
 }) {
   const category = getCategoryBySlug(slug);
   if (!category) return null;
-  const products = productsByCategory(slug).slice(0, 4);
+  const products = allProducts.filter((p) => p.category === slug).slice(0, 4);
 
   return (
     <section className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">

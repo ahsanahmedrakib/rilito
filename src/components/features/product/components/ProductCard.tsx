@@ -21,6 +21,7 @@ export function ProductCard({
   const wished = isWishlisted(product.slug);
   const onSale = !!product.salePrice;
   const stars = Math.round(product.rating);
+  const outOfStock = product.stock <= 0;
 
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-ink-200/60 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-ink-950/10">
@@ -31,18 +32,25 @@ export function ProductCard({
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition duration-500 group-hover:scale-105"
+            className={`object-cover transition duration-500 group-hover:scale-105 ${outOfStock ? "opacity-70" : ""}`}
             priority={priority}
           />
+          {outOfStock && (
+            <div className="absolute inset-0 grid place-items-center bg-ink-950/30">
+              <span className="rounded-full bg-ink-950/90 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
+                Unavailable
+              </span>
+            </div>
+          )}
         </Link>
 
         <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-          {onSale && (
+          {onSale && !outOfStock && (
             <span className="rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
               -{discountPercent(product.price, product.salePrice)}%
             </span>
           )}
-          {product.isNew && !onSale && (
+          {product.isNew && !onSale && !outOfStock && (
             <span className="rounded-full bg-ink-950/85 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
               New
             </span>
@@ -67,16 +75,22 @@ export function ProductCard({
           />
         </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            addToCart(product, product.sizes[0], product.colors[0].name, 1);
-            toast("Added to cart", product.name);
-          }}
-          className="absolute inset-x-3 bottom-3 hidden items-center justify-center gap-2 rounded-xl bg-ink-950/90 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-brand-600 sm:flex"
-        >
-          Add to Cart
-        </button>
+        {outOfStock ? (
+          <div className="absolute inset-x-3 bottom-3 hidden cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-ink-200 py-2.5 text-sm font-semibold text-ink-500 sm:flex">
+            Unavailable
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              addToCart(product, product.sizes[0], product.colors[0].name, 1);
+              toast("Added to cart", product.name);
+            }}
+            className="absolute inset-x-3 bottom-3 hidden items-center justify-center gap-2 rounded-xl bg-ink-950/90 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-brand-600 sm:flex"
+          >
+            Add to Cart
+          </button>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-1 p-4">

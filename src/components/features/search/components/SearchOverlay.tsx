@@ -1,7 +1,6 @@
 "use client";
 
 import { CloseIcon, SearchIcon } from "@/components/shared/components/icons";
-import { searchProducts } from "@/features/product/data/products";
 import { trendingSearches } from "@/features/search/data/trending";
 import { useStore } from "@/lib/store";
 import { formatPrice } from "@/lib/utils";
@@ -11,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 export function SearchOverlay() {
-  const { searchOpen, setSearchOpen } = useStore();
+  const { searchOpen, setSearchOpen, products } = useStore();
   const [query, setQuery] = useState("");
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +31,15 @@ export function SearchOverlay() {
   if (!searchOpen) return null;
 
   const results =
-    query.trim().length >= 2 ? searchProducts(query).slice(0, 6) : [];
+    query.trim().length >= 2
+      ? products
+          .filter((p) =>
+            `${p.name} ${p.category} ${p.tags.join(" ")}`
+              .toLowerCase()
+              .includes(query.trim().toLowerCase())
+          )
+          .slice(0, 6)
+      : [];
 
   const submit = () => {
     if (!query.trim()) return;
