@@ -34,7 +34,7 @@ export default function BlogIndexPage() {
         href={`/blog/${featured.slug}`}
         className="group mt-10 grid overflow-hidden rounded-3xl bg-white ring-1 ring-ink-200/60 md:grid-cols-2"
       >
-        <div className="relative aspect-[16/10] overflow-hidden bg-ink-100 md:aspect-auto">
+        <div className="relative aspect-16/10 overflow-hidden bg-ink-100 md:aspect-auto">
           <Image
             src={featured.image}
             alt={featured.title}
@@ -71,7 +71,7 @@ export default function BlogIndexPage() {
             href={`/blog/${post.slug}`}
             className="group overflow-hidden rounded-2xl bg-white ring-1 ring-ink-200/60 transition hover:-translate-y-1 hover:shadow-xl"
           >
-            <div className="relative aspect-[16/10] overflow-hidden bg-ink-100">
+            <div className="relative aspect-16/10 overflow-hidden bg-ink-100">
               <Image
                 src={post.image}
                 alt={post.title}

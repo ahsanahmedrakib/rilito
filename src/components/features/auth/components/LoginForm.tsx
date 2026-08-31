@@ -4,9 +4,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { loginSchema, type LoginValues } from "@/features/auth/data/authSchemas";
 import { useStore } from "@/lib/store";
-import { LockIcon, UserIcon } from "@/components/shared/components/icons";
+import { EyeIcon, EyeOffIcon, LockIcon, UserIcon } from "@/components/shared/components/icons";
 import { cn } from "@/lib/utils";
 
 const inputCls =
@@ -15,6 +16,7 @@ const inputCls =
 export function LoginForm() {
   const { login, toast } = useStore();
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -73,11 +75,19 @@ export function LoginForm() {
           <div className="relative">
             <LockIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Your password"
-              className={cn(inputCls, "pl-11", errors.password && "border-red-400")}
+              className={cn(inputCls, "pl-11 pr-12", errors.password && "border-red-400")}
               {...register("password")}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 transition hover:text-ink-900"
+            >
+              {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+            </button>
           </div>
           {errors.password && (
             <p className="mt-1 text-xs font-semibold text-red-600" role="alert">

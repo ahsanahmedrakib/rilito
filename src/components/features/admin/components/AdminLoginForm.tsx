@@ -2,11 +2,13 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import {
   adminLoginSchema,
   type AdminLoginValues,
 } from "@/features/admin/data/adminSchemas";
-import { LogoMark, LockIcon } from "@/components/shared/components/icons";
+import { cn } from "@/lib/utils";
+import { EyeIcon, EyeOffIcon, LogoMark, LockIcon } from "@/components/shared/components/icons";
 
 const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white pl-11 pr-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-ink-400 focus:border-ink-950";
@@ -16,6 +18,7 @@ export function AdminLoginForm({
 }: {
   onLogin: (email: string, password: string) => Promise<boolean>;
 }) {
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -65,7 +68,20 @@ export function AdminLoginForm({
           </label>
           <div className="relative">
             <LockIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
-            <input type="password" placeholder="Admin password" className={inputCls} {...register("password")} />
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Admin password"
+              className={cn(inputCls, "pr-12")}
+              {...register("password")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 transition hover:text-ink-900"
+            >
+              {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+            </button>
           </div>
           {errors.password && (
             <p className="mt-1 text-xs font-semibold text-red-600" role="alert">

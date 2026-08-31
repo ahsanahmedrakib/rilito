@@ -4,12 +4,18 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import {
   registerSchema,
   type RegisterValues,
 } from "@/features/auth/data/authSchemas";
 import { useStore } from "@/lib/store";
-import { LockIcon, UserIcon } from "@/components/shared/components/icons";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  LockIcon,
+  UserIcon,
+} from "@/components/shared/components/icons";
 import { cn } from "@/lib/utils";
 
 const inputCls =
@@ -18,6 +24,7 @@ const inputCls =
 export function RegisterForm() {
   const { register: registerUser, toast } = useStore();
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -118,11 +125,19 @@ export function RegisterForm() {
           <div className="relative">
             <LockIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Min 6 characters"
-              className={cn(inputCls, "pl-11", errors.password && "border-red-400")}
+              className={cn(inputCls, "pl-11 pr-12", errors.password && "border-red-400")}
               {...register("password")}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 transition hover:text-ink-900"
+            >
+              {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+            </button>
           </div>
           {errors.password && (
             <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
@@ -134,12 +149,22 @@ export function RegisterForm() {
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
             Confirm Password *
           </label>
-          <input
-            type="password"
-            placeholder="Repeat password"
-            className={cn(inputCls, errors.confirm && "border-red-400")}
-            {...register("confirm")}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Repeat password"
+              className={cn(inputCls, "pr-12", errors.confirm && "border-red-400")}
+              {...register("confirm")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 transition hover:text-ink-900"
+            >
+              {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+            </button>
+          </div>
           {errors.confirm && (
             <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
               {errors.confirm.message}
