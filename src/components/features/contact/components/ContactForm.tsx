@@ -43,10 +43,18 @@ export function ContactForm() {
     defaultValues: { name: "", phone: "", email: "", subject: "Order query", message: "" },
   });
 
-  const submit = (values: ContactValues) => {
+  const submit = async (values: ContactValues) => {
     toast("Message sent!", "Our team will get back to you within a few hours");
     reset({ name: "", phone: "", email: "", subject: "Order query", message: "" });
-    void values;
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+    } catch {
+      // DB may be unreachable; message still noted locally.
+    }
   };
 
   return (

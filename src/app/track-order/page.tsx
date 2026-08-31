@@ -73,10 +73,10 @@ export default function TrackOrderPage() {
       {result && !result.found && result.orderId && (
         <div className="mx-auto mt-8 max-w-md rounded-2xl bg-amber-50 p-5 text-center">
           <p className="text-sm font-semibold text-amber-800">
-            We couldn't find order &ldquo;{result.orderId}&rdquo;.
+            We couldn&rsquo;t find order &ldquo;{result.orderId}&rdquo;.
           </p>
           <p className="mt-1 text-xs text-amber-700">
-            Double-check the ID, or call our hotline 01979-394059 for help
+            Double-check the ID, or call our hotline 01611-773755 for help
             tracing it.
           </p>
         </div>

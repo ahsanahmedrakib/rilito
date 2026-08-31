@@ -12,12 +12,14 @@ const nav = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/track-order", label: "Track Order" },
+  { href: "/admin/payment", label: "Payment" },
   { href: "/admin/categories", label: "Categories" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/deleted-data", label: "Deleted data" },
   { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/coupons", label: "Coupons" },
   { href: "/admin/users", label: "Users" },
+  { href: "/admin/contact", label: "Contact" },
 ];
 
 function NavLinks({

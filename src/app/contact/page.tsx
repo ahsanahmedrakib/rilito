@@ -49,14 +49,14 @@ export default function ContactPage() {
           {
             icon: <MailIcon className="h-6 w-6" />,
             title: "Email",
-            value: "support@rilito.com",
-            href: "mailto:support@rilito.com",
+            value: "rilito.com@gmail.com",
+            href: "mailto:rilito.com@gmail.com",
           },
           {
             icon: <WhatsAppIcon className="h-6 w-6" />,
             title: "WhatsApp",
             value: "Chat with support",
-            href: "https://wa.me/8801979394059",
+            href: "https://wa.me/8801611773755",
           },
           {
             icon: <FacebookIcon className="h-6 w-6" />,
@@ -101,18 +101,18 @@ export default function ContactPage() {
               <PinIcon className="h-5 w-5 text-brand-500" /> Visit The Store
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-ink-300">
-              Level 3, Shop 12, Bashundhara City,
+              Biswas Market, Bangabandhu Sarak Bylane,
               <br />
-              Panthapath, Dhaka 1205, Bangladesh
+              Gopalganj-8100, Bangladesh
             </p>
             <p className="mt-2 text-xs text-ink-400">
-              Open every day · 11:00 AM – 9:30 PM (Fri from 3:00 PM)
+              Open Sunday - Friday · 09:00 AM - 9:00 PM (Saturday off)
             </p>
           </div>
 
           <div className="overflow-hidden rounded-3xl ring-1 ring-ink-200/60">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d109250.7135499152!2d89.76903518862562!3d23.013011745592483!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ffc326eacd8aa3%3A0x64e624959426002b!2sRILITO!5e1!3m2!1sen!2sbd!4v1788196569065!5m2!1sen!2sbd"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6846.093748230219!2d89.82811416343169!3d23.009017439793762!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39ffc326eacd8aa3%3A0x64e624959426002b!2sRILITO!5e1!3m2!1sen!2sbd!4v1788202611156!5m2!1sen!2sbd"
               width="100%"
               height="380"
               style={{ border: 0 }}
@@ -134,7 +134,7 @@ export default function ContactPage() {
             </p>
             <div className="mt-4 flex items-center gap-3">
               <a
-                href="https://wa.me/8801979394059"
+                href="https://wa.me/8801611773755"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-xs font-bold uppercase tracking-wide text-white transition hover:bg-emerald-700"
@@ -168,7 +168,7 @@ export default function ContactPage() {
                 <FacebookIcon className="h-5 w-5" />
               </a>
               <a
-                href="https://www.tiktok.com/@rilito.bd"
+                href="https://www.tiktok.com/@rilito.com"
                 target="_blank"
                 rel="noreferrer"
                 className="grid h-11 w-11 place-items-center rounded-full bg-ink-100 text-ink-900 transition hover:bg-brand-600 hover:text-white"

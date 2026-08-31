@@ -30,8 +30,8 @@ export const contactChannels: ContactChannel[] = [
   {
     id: "email",
     title: "Email",
-    value: "support@rilito.com",
-    href: "mailto:support@rilito.com",
+    value: "rilito.com@gmail.com",
+    href: "mailto:rilito.com@gmail.com",
   },
   {
     id: "whatsapp",

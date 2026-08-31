@@ -12,7 +12,7 @@ import {
   WhatsAppIcon,
   YoutubeIcon,
 } from "@/components/shared/components/icons";
-import { HOTLINE, socialLinks } from "@/components/shared/data/site";
+import { HOTLINE, SUPPORT_EMAIL, socialLinks } from "@/components/shared/data/site";
 import {
   companyLinks,
   paymentMethods,
@@ -53,15 +53,15 @@ export function Footer() {
                 <PhoneIcon className="h-4 w-4 text-brand-500" /> {HOTLINE}
               </a>
               <a
-                href="mailto:support@rilito.com"
+                href={`mailto:${SUPPORT_EMAIL}`}
                 className="flex items-center gap-2.5 hover:text-white"
               >
                 <MailIcon className="h-4 w-4 text-brand-500" />{" "}
-                support@rilito.com
+                {SUPPORT_EMAIL}
               </a>
               <p className="flex items-start gap-2.5">
                 <PinIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
-                Level 3, Shop 12, Bashundhara City, Panthapath, Dhaka 1205
+                Biswas Market, Bangabandhu Sarak Bylane, Gopalganj-8100
               </p>
             </div>
           </div>

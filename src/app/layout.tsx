@@ -107,7 +107,8 @@ const jsonLd = {
   address: {
     "@type": "PostalAddress",
     streetAddress: STORE_ADDRESS,
-    addressLocality: "Dhaka",
+    addressLocality: "Gopalganj",
+    postalCode: "8100",
     addressCountry: "BD",
   },
   sameAs: Object.values(socialLinks),

@@ -115,3 +115,14 @@ export interface AppSettings {
   paymentNumber: string;
   paymentNote: string;
 }
+
+export interface ContactQuery {
+  id: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  subject: string;
+  message: string;
+  read: boolean;
+  date: string;
+}

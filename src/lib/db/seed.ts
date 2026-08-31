@@ -45,13 +45,21 @@ export async function seedCollections(): Promise<void> {
   }
 
   for (const key of SETTING_KEYS) {
+    const defaults: Record<string, string> = {
+      qrImage: "",
+      paymentNumber: "01611-773755",
+      paymentNote: "Send to this number and keep the transaction ID.",
+    };
     const existing = await Setting.findOne({ key }).exec();
-    if (!existing) {
-      const defaults: Record<string, string> = {
-        qrImage: "",
-        paymentNumber: "01979-394059",
-        paymentNote: "Send to this number and keep the transaction ID.",
-      };
+    if (
+      key === "paymentNumber" &&
+      existing &&
+      String(existing.value) === "01979-394059"
+    ) {
+      existing.value =
+        "01611-773755" as unknown as mongoose.Schema.Types.Mixed;
+      await existing.save();
+    } else if (!existing) {
       await Setting.create({
         key,
         value: (defaults[key] ?? "") as unknown as mongoose.Schema.Types.Mixed,
@@ -87,7 +95,7 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
 export async function readSettings() {
   const [qrImage, paymentNumber, paymentNote] = await Promise.all([
     getSetting<string>("qrImage", ""),
-    getSetting<string>("paymentNumber", "01979-394059"),
+    getSetting<string>("paymentNumber", "01611-773755"),
     getSetting<string>("paymentNote", "Send to this number and keep the transaction ID."),
   ]);
   return { qrImage, paymentNumber, paymentNote };

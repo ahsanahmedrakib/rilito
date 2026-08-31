@@ -291,6 +291,31 @@ export const Setting =
   (models.Setting as mongoose.Model<SettingDoc>) ??
   model<SettingDoc>("Setting", SettingSchema);
 
+export interface ContactQueryDoc {
+  name: string;
+  phone: string;
+  email: string;
+  subject: string;
+  message: string;
+  read: boolean;
+}
+
+const ContactQuerySchema = new Schema<ContactQueryDoc>(
+  {
+    name: { type: String, required: true, trim: true },
+    phone: { type: String, default: "" },
+    email: { type: String, default: "" },
+    subject: { type: String, required: true, trim: true },
+    message: { type: String, required: true, trim: true },
+    read: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
+
+export const ContactQuery =
+  (models.ContactQuery as mongoose.Model<ContactQueryDoc>) ??
+  model<ContactQueryDoc>("ContactQuery", ContactQuerySchema);
+
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
 }

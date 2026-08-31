@@ -14,6 +14,7 @@ import type {
   AppSettings,
   CartItem,
   Category,
+  ContactQuery,
   Coupon,
   Order,
   Product,
@@ -115,6 +116,9 @@ interface StoreContextValue {
     id: string,
     tracking: { courier: string; trackingId: string; note: string }
   ) => void;
+  contactQueries: ContactQuery[];
+  markContactQuery: (id: string, read: boolean) => void;
+  deleteContactQuery: (id: string) => void;
   toast: (title: string, description?: string, variant?: Toast["variant"]) => void;
   toasts: Toast[];
 }
@@ -147,7 +151,7 @@ async function api<T>(path: string, options?: RequestInit): Promise<T | null> {
 
 const defaultSettings: AppSettings = {
   qrImage: "",
-  paymentNumber: "01979-394059",
+  paymentNumber: "01611-773755",
   paymentNote: "Send to this number and keep the transaction ID.",
 };
 
@@ -164,6 +168,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminAccount | null>(null);
   const [adminUsers, setAdminUsers] = useState<AdminAccount[]>([]);
+  const [contactQueries, setContactQueries] = useState<ContactQuery[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -212,6 +217,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
         const usersRes = await api<{ users: AdminAccount[] }>("/admin/users");
         if (usersRes?.users) setAdminUsers(usersRes.users);
+
+        const contactRes = await api<{ queries: ContactQuery[] }>("/admin/contact");
+        if (contactRes?.queries) setContactQueries(contactRes.queries);
       } else {
         setOrders(readLS("rilito-orders", []));
       }
@@ -596,6 +604,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const markContactQuery = useCallback((id: string, read: boolean) => {
+    setContactQueries((prev) => prev.map((q) => (q.id === id ? { ...q, read } : q)));
+    api("/admin/contact", { method: "PATCH", body: JSON.stringify({ id, read }) });
+  }, []);
+
+  const deleteContactQuery = useCallback((id: string) => {
+    setContactQueries((prev) => prev.filter((q) => q.id !== id));
+    api("/admin/contact", { method: "DELETE", body: JSON.stringify({ id }) });
+  }, []);
+
   const deletedProducts = useMemo(
     () => products.filter((p) => p.deleted),
     [products]
@@ -659,6 +677,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     placeOrder,
     updateOrderStatus,
     updateOrderTracking,
+    contactQueries,
+    markContactQuery,
+    deleteContactQuery,
     toast,
     toasts,
   };

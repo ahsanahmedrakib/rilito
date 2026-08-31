@@ -7,7 +7,7 @@ import {
   PhoneIcon,
   TikTokIcon,
 } from "@/components/shared/components/icons";
-import { socialLinks } from "@/components/shared/data/site";
+import { HOTLINE, HOTLINE_LINK, socialLinks } from "@/components/shared/data/site";
 import { useStore } from "@/lib/store";
 import Link from "next/link";
 
@@ -112,10 +112,10 @@ export function MobileMenu() {
             </a>
           </div>
           <a
-            href="tel:01979394059"
+            href={HOTLINE_LINK}
             className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-brand-600 py-2.5 text-sm font-semibold text-white"
           >
-            <PhoneIcon className="h-4 w-4" /> Call 01979-394059
+            <PhoneIcon className="h-4 w-4" /> Call {HOTLINE}
           </a>
         </footer>
       </aside>
