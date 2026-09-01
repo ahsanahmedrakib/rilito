@@ -14,4 +14,4 @@ export const companyLinks = [
   { href: "/pages/faq", label: "FAQ" },
 ];
 
-export const paymentMethods = ["Cash on Delivery", "bKash", "Nagad"];
+export const paymentMethods = ["Cash on Delivery", "bKash", "Bangla QR"];

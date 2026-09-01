@@ -6,9 +6,11 @@ import {
   type ProfileFormState,
 } from "@/components/features/account/components/AccountProfileForm";
 import { LogoutIcon, PackageIcon } from "@/components/shared/components/icons";
+import { AccountSkeleton } from "@/components/shared/components/AccountSkeleton";
 import { useStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import type { Order, User } from "@/lib/types";
 
 const initialForm: ProfileFormState = {
   name: "",
@@ -18,26 +20,27 @@ const initialForm: ProfileFormState = {
   city: "Dhaka",
 };
 
-export function AccountContent() {
-  const { ready, user, logout, updateProfile, orders, toast } = useStore();
-  const router = useRouter();
-  const [form, setForm] = useState<ProfileFormState>(initialForm);
-
-  useEffect(() => {
-    if (ready && !user) router.replace("/login");
-  }, [ready, user, router]);
-
-  useEffect(() => {
-    if (user) setForm({ ...initialForm, ...user });
-  }, [user]);
-
-  if (!ready || !user) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center text-sm text-ink-500">
-        Loading your account...
-      </div>
-    );
-  }
+function AccountPanel({
+  user,
+  onSignOut,
+  updateProfile,
+  orders,
+  toast,
+}: {
+  user: User;
+  onSignOut: () => void;
+  updateProfile: (form: ProfileFormState) => void;
+  orders: Order[];
+  toast: (
+    title: string,
+    description?: string,
+    variant?: "success" | "info" | "error"
+  ) => void;
+}) {
+  const [form, setForm] = useState<ProfileFormState>(() => ({
+    ...initialForm,
+    ...user,
+  }));
 
   const save = () => {
     updateProfile(form);
@@ -60,11 +63,7 @@ export function AccountContent() {
           </p>
         </div>
         <button
-          onClick={() => {
-            logout();
-            toast("Signed out", "See you soon!", "info");
-            router.push("/");
-          }}
+          onClick={onSignOut}
           className="inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-5 py-2.5 text-sm font-semibold text-ink-900 transition hover:border-ink-950"
         >
           <LogoutIcon className="h-4 w-4" /> Sign Out
@@ -81,6 +80,33 @@ export function AccountContent() {
         </section>
       </div>
     </div>
+  );
+}
+
+export function AccountContent() {
+  const { ready, user, logout, updateProfile, orders, toast } = useStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (ready && !user) router.replace("/login");
+  }, [ready, user, router]);
+
+  if (!ready || !user) {
+    return <AccountSkeleton />;
+  }
+
+  return (
+    <AccountPanel
+      user={user}
+      onSignOut={() => {
+        logout();
+        toast("Signed out", "See you soon!", "info");
+        router.push("/");
+      }}
+      updateProfile={updateProfile}
+      orders={orders}
+      toast={toast}
+    />
   );
 }
 

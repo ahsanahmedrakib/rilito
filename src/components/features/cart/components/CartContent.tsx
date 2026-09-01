@@ -12,6 +12,7 @@ import {
   FREE_SHIPPING_THRESHOLD,
   SHIPPING_FEE,
 } from "@/features/cart/data/shipping";
+import { CartSkeleton } from "@/components/shared/components/CartSkeleton";
 import { useStore } from "@/lib/store";
 import { discountForCoupon } from "@/lib/coupons";
 import { formatPrice } from "@/lib/utils";
@@ -20,7 +21,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 export function CartContent() {
-  const { cart, updateQty, removeFromCart, cartSubtotal, cartCount, coupons, toast } =
+  const { cart, updateQty, removeFromCart, cartSubtotal, cartCount, coupons, toast, ready } =
     useStore();
   const [promo, setPromo] = useState("");
   const [discount, setDiscount] = useState(0);
@@ -40,6 +41,10 @@ export function CartContent() {
       toast("Invalid coupon", "Try a different code", "info");
     }
   };
+
+  if (!ready) {
+    return <CartSkeleton />;
+  }
 
   if (cart.length === 0) {
     return (

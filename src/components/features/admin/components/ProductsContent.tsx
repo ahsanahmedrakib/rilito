@@ -1,11 +1,29 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ProductForm } from "@/features/admin/components/ProductForm";
 import { useStore } from "@/lib/store";
 import { formatPrice } from "@/lib/utils";
+
+const ProductForm = dynamic(
+  () =>
+    import("@/features/admin/components/ProductForm").then(
+      (m) => m.ProductForm
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="space-y-5 rounded-2xl bg-white p-6 ring-1 ring-ink-200/60">
+        <div className="h-6 w-40 animate-pulse rounded-lg bg-ink-200/70" />
+        <div className="h-12 w-full animate-pulse rounded-xl bg-ink-200/70" />
+        <div className="h-12 w-full animate-pulse rounded-xl bg-ink-200/70" />
+        <div className="h-12 w-full animate-pulse rounded-xl bg-ink-200/70" />
+      </div>
+    ),
+  }
+);
 
 function AdminProductsManager() {
   const { products, saveProduct, deleteProduct, toast } = useStore();
@@ -13,8 +31,12 @@ function AdminProductsManager() {
   const params = useSearchParams();
   const [query, setQuery] = useState("");
 
-  const mode = params.get("new") ? "new" : params.get("edit");
-  const editing = mode === "edit" ? products.find((p) => p.id === params.get("edit")) : undefined;
+  const isNew = Boolean(params.get("new"));
+  const editId = params.get("edit");
+  const editing = editId
+    ? products.find((p) => p.id === editId)
+    : undefined;
+  const mode = isNew ? "new" : editing ? "edit" : null;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

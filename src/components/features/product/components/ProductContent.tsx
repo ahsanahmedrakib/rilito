@@ -1,21 +1,60 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ProductJsonLd } from "@/features/product/components/ProductJsonLd";
 import {
   CheckIcon,
   StarFilledIcon,
 } from "@/components/shared/components/icons";
+import { Skeleton } from "@/components/shared/components/Skeleton";
 import { ProductActions } from "@/features/product/components/ProductActions";
-import { ProductGallery } from "@/features/product/components/ProductGallery";
-import { ProductScroller } from "@/features/product/components/ProductScroller";
-import { ReviewModal } from "@/features/product/components/ReviewModal";
 import { getCategoryBySlug } from "@/features/category/data/categories";
 import { useStore } from "@/lib/store";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useState } from "react";
+
+const ProductGallery = dynamic(
+  () =>
+    import("@/features/product/components/ProductGallery").then(
+      (m) => m.ProductGallery
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <Skeleton className="mr-0 aspect-square w-full rounded-3xl" />
+    ),
+  }
+);
+
+const ProductScroller = dynamic(
+  () =>
+    import("@/features/product/components/ProductScroller").then(
+      (m) => m.ProductScroller
+    ),
+  {
+    loading: () => (
+      <div className="flex gap-4 overflow-hidden">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="aspect-[3/4] w-40 shrink-0 rounded-2xl md:w-48" />
+        ))}
+      </div>
+    ),
+  }
+);
+
+const ReviewModal = dynamic(
+  () =>
+    import("@/features/product/components/ReviewModal").then(
+      (m) => m.ReviewModal
+    ),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
 
 function Stars({ rating, size = "h-4 w-4" }: { rating: number; size?: string }) {
   return (

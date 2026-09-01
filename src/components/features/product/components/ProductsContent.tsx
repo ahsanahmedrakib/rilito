@@ -2,6 +2,7 @@
 
 import { Suspense, useMemo } from "react";
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
+import { ProductsSkeleton } from "@/components/shared/components/ProductsSkeleton";
 import {
   ChevronLeft,
   ChevronRight,
@@ -40,7 +41,7 @@ function getSort(sort: string) {
 }
 
 function ProductsBrowser() {
-  const { products, categories } = useStore();
+  const { products, categories, ready } = useStore();
   const searchParams = useSearchParams();
 
   const category = searchParams.get("category") ?? "";
@@ -51,7 +52,7 @@ function ProductsBrowser() {
   const page = Math.max(1, Number(searchParams.get("page")) || 1);
 
   const results = useMemo(() => {
-    let list = products.filter((p) => {
+    const list = products.filter((p) => {
       if (category && p.category !== category) return false;
       const price = p.salePrice ?? p.price;
       if (price < min || price > max) return false;
@@ -64,6 +65,8 @@ function ProductsBrowser() {
     });
     return [...list].sort(getSort(sort));
   }, [products, category, min, max, q, sort]);
+
+  if (!ready) return <ProductsSkeleton />;
 
   const total = results.length;
   const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
@@ -181,7 +184,7 @@ function ProductsBrowser() {
             <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white py-24 text-center ring-1 ring-ink-200/60">
               <p className="text-lg font-bold text-ink-950">No products found</p>
               <p className="max-w-sm text-sm text-ink-500">
-                Try adjusting your filters or clearing the search — there's plenty
+                Try adjusting your filters or clearing the search — there&rsquo;s plenty
                 more to explore.
               </p>
               <Link

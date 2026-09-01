@@ -2,12 +2,17 @@
 
 import { ArrowRight, HeartIcon } from "@/components/shared/components/icons";
 import { ProductCard } from "@/features/product/components/ProductCard";
+import { WishlistSkeleton } from "@/components/shared/components/WishlistSkeleton";
 import { useStore } from "@/lib/store";
 import Link from "next/link";
 
 export function WishlistContent() {
-  const { wishlist, toggleWishlist, toast, products } = useStore();
+  const { wishlist, toggleWishlist, toast, products, ready } = useStore();
   const items = products.filter((p) => wishlist.includes(p.slug));
+
+  if (!ready) {
+    return <WishlistSkeleton />;
+  }
 
   if (wishlist.length === 0) {
     return (

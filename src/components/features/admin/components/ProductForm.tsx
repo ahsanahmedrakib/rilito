@@ -1,6 +1,7 @@
 "use client";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
   buildProduct,
@@ -102,6 +103,11 @@ export function ProductForm({
   const colorOptions = textToColors(watch("colors"));
   const setColorOptions = (arr: ColorOption[]) =>
     setValue("colors", colorsToText(arr), { shouldValidate: true });
+
+  const editingId = product?.id;
+  useEffect(() => {
+    reset(toFormValues(product, products));
+  }, [editingId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedSizes = splitLines(watch("sizes"));
   const sizeStockMap = parseSizeStocks(watch("sizeStocks"));
@@ -280,7 +286,7 @@ export function ProductForm({
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {selectedSizes.map((s) => (
                 <div key={s} className="flex items-center gap-2 rounded-xl border border-ink-200 px-3 py-2">
-                  <span className="min-w-[32px] text-sm font-bold text-ink-900">{s}</span>
+                  <span className="min-w-8 text-sm font-bold text-ink-900">{s}</span>
                   <input
                     type="number"
                     min={0}

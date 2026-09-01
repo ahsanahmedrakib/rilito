@@ -1,6 +1,7 @@
 "use client";
 
 import { discountForCoupon } from "@/lib/coupons";
+import { CheckoutSkeleton } from "@/components/shared/components/CheckoutSkeleton";
 import { useStore } from "@/lib/store";
 import { formatPrice } from "@/lib/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -27,6 +28,7 @@ export function CheckoutContent() {
     user,
     coupons,
     settings,
+    ready,
   } = useStore();
   const router = useRouter();
 
@@ -106,6 +108,10 @@ export function CheckoutContent() {
       toast("Order placed!", `Your order ID is ${order.id}`);
     }, 1200);
   });
+
+  if (!ready) {
+    return <CheckoutSkeleton />;
+  }
 
   if (cart.length === 0) {
     return (

@@ -9,6 +9,7 @@ import {
   TruckIcon,
 } from "@/components/shared/components/icons";
 import { SectionHeading } from "@/components/shared/components/SectionHeading";
+import { SiteSkeleton } from "@/components/shared/components/SiteSkeleton";
 import { HeroSlider } from "@/features/home/components/HeroSlider";
 import { Newsletter } from "@/features/home/components/Newsletter";
 import { ProductScroller } from "@/features/product/components/ProductScroller";
@@ -63,10 +64,12 @@ const testimonials = [
 ];
 
 export default function HomeContent() {
-  const { products } = useStore();
+  const { products, ready } = useStore();
   const bestSellers = products.filter((p) => p.isBestSeller);
   const newArrivals = products.filter((p) => p.isNew);
   const byCategory = (slug: string) => products.filter((p) => p.category === slug);
+
+  if (!ready) return <SiteSkeleton />;
 
   return (
     <>
@@ -255,7 +258,7 @@ export default function HomeContent() {
                     40%<span className="text-brand-500">Off</span>
                   </p>
                   <p className="mt-3 text-sm text-ink-300">
-                    on this season's {cat.name.toLowerCase()}
+                    on this season&rsquo;s {cat.name.toLowerCase()}
                   </p>
                   <Link
                     href={`/category/${catSlug}`}

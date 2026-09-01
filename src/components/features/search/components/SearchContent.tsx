@@ -3,12 +3,13 @@
 import { Suspense, useMemo } from "react";
 import { ArrowRight, SearchIcon } from "@/components/shared/components/icons";
 import { ProductCard } from "@/features/product/components/ProductCard";
+import { SearchSkeleton } from "@/components/shared/components/SearchSkeleton";
 import { useStore } from "@/lib/store";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 function SearchResults() {
-  const { products } = useStore();
+  const { products, ready } = useStore();
   const params = useSearchParams();
   const q = (params.get("q") ?? "").trim();
   const results = useMemo(() => {
@@ -40,6 +41,10 @@ function SearchResults() {
         </Link>
       </div>
     );
+  }
+
+  if (q && !ready) {
+    return <SearchSkeleton />;
   }
 
   return (

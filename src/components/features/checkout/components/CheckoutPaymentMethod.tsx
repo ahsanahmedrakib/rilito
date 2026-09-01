@@ -66,9 +66,9 @@ export function CheckoutPaymentMethod({
               <Image
                 src={settings.qrImage}
                 alt="Payment QR code"
-                className="h-44 w-44 rounded-lg object-contain"
-                height={176}
-                width={176}
+                className="rounded-lg object-contain"
+                height={1000}
+                width={1000}
               />
             </div>
           )}
@@ -86,7 +86,10 @@ export function CheckoutPaymentMethod({
               {...register("transactionId")}
             />
             {errors.transactionId && (
-              <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+              <p
+                className="mt-1 text-xs font-semibold text-red-600"
+                role="alert"
+              >
                 {errors.transactionId.message}
               </p>
             )}
@@ -111,4 +114,3 @@ export function CheckoutPaymentMethod({
     </section>
   );
 }
-
