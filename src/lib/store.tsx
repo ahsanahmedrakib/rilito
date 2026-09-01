@@ -47,7 +47,7 @@ interface Toast {
   id: number;
   title: string;
   description?: string;
-  variant?: "success" | "info";
+  variant?: "success" | "info" | "error";
 }
 
 interface StoreContextValue {
@@ -69,12 +69,12 @@ interface StoreContextValue {
   mobileOpen: boolean;
   setMobileOpen: (open: boolean) => void;
   user: User | null;
-  register: (user: User & { password: string }) => Promise<boolean>;
-  login: (email: string, password: string) => Promise<boolean>;
+  register: (user: User & { password: string }) => Promise<{ ok: boolean; error: string | null }>;
+  login: (email: string, password: string) => Promise<{ ok: boolean; error: string | null }>;
   logout: () => void;
   updateProfile: (patch: Partial<User>) => void;
   isAdmin: boolean;
-  loginAdmin: (email: string, password: string) => Promise<boolean>;
+  loginAdmin: (email: string, password: string) => Promise<{ ok: boolean; error: string | null }>;
   logoutAdmin: () => void;
   adminUser: AdminAccount | null;
   adminUsers: AdminAccount[];
@@ -135,17 +135,33 @@ function readLS<T>(key: string, fallback: T): T {
   }
 }
 
-async function api<T>(path: string, options?: RequestInit): Promise<T | null> {
+async function api<T>(
+  path: string,
+  options?: RequestInit
+): Promise<{ data: T | null; error: string | null }> {
   try {
     const res = await fetch(`/api${path}`, {
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
       ...options,
     });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
+    const text = await res.text();
+    let json: unknown = null;
+    try {
+      json = text ? JSON.parse(text) : null;
+    } catch {
+      json = null;
+    }
+    if (!res.ok) {
+      const message =
+        (json as { error?: string } | null)?.error ||
+        `Request failed with status ${res.status}`;
+      return { data: null, error: message };
+    }
+    return { data: (json as T) ?? null, error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Network error";
+    return { data: null, error: message };
   }
 }
 
@@ -198,11 +214,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         api<{ settings: AppSettings }>("/settings"),
       ]);
 
-      setProducts(pd?.products?.length ? pd.products : readLS("rilito-products", allProducts));
-      setCategories(ct?.categories?.length ? ct.categories : readLS("rilito-categories", defaultCategories));
-      setCoupons(cp?.coupons?.length ? cp.coupons : defaultCoupons());
-      setReviews(rv?.reviews ? rv.reviews : readLS("rilito-reviews", []));
-      if (st?.settings) setSettings({ ...defaultSettings, ...st.settings });
+      setProducts(pd?.data?.products?.length ? pd.data.products : readLS("rilito-products", allProducts));
+      setCategories(ct?.data?.categories?.length ? ct.data.categories : readLS("rilito-categories", defaultCategories));
+      setCoupons(cp?.data?.coupons?.length ? cp.data.coupons : defaultCoupons());
+      setReviews(rv?.data?.reviews ? rv.data.reviews : readLS("rilito-reviews", []));
+      if (st?.data?.settings) setSettings({ ...defaultSettings, ...st.data.settings });
 
       const [adminMe, customerMe, adminOrders] = await Promise.all([
         api<{ user: ApiUser }>("/auth/me"),
@@ -210,33 +226,33 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         api<{ orders: Order[] }>("/admin/orders"),
       ]);
 
-      if (adminMe?.user) {
+      if (adminMe?.data?.user) {
         setIsAdmin(true);
         setAdminUser({
-          id: String(adminMe.user._id ?? adminMe.user.id ?? ""),
-          name: adminMe.user.name ?? "",
-          email: adminMe.user.email ?? "",
-          role: adminMe.user.role === "superadmin" ? "superadmin" : "admin",
+          id: String(adminMe.data.user._id ?? adminMe.data.user.id ?? ""),
+          name: adminMe.data.user.name ?? "",
+          email: adminMe.data.user.email ?? "",
+          role: adminMe.data.user.role === "superadmin" ? "superadmin" : "admin",
         });
-        if (adminOrders?.orders?.length) setOrders(adminOrders.orders);
+        if (adminOrders?.data?.orders?.length) setOrders(adminOrders.data.orders);
         else setOrders(readLS("rilito-orders", []));
 
         const usersRes = await api<{ users: AdminAccount[] }>("/admin/users");
-        if (usersRes?.users) setAdminUsers(usersRes.users);
+        if (usersRes.data?.users) setAdminUsers(usersRes.data.users);
 
         const contactRes = await api<{ queries: ContactQuery[] }>("/admin/contact");
-        if (contactRes?.queries) setContactQueries(contactRes.queries);
+        if (contactRes.data?.queries) setContactQueries(contactRes.data.queries);
       } else {
         setOrders(readLS("rilito-orders", []));
       }
 
-      if (customerMe?.user) {
+      if (customerMe?.data?.user) {
         setUser({
-          name: customerMe.user.name ?? "",
-          email: customerMe.user.email ?? "",
-          phone: customerMe.user.phone ?? "",
-          address: customerMe.user.address ?? "",
-          city: customerMe.user.city ?? "",
+          name: customerMe.data.user.name ?? "",
+          email: customerMe.data.user.email ?? "",
+          phone: customerMe.data.user.phone ?? "",
+          address: customerMe.data.user.address ?? "",
+          city: customerMe.data.user.city ?? "",
         });
       }
 
@@ -262,8 +278,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [orders]);
 
   const toast = useCallback(
-    (title: string, description?: string, variant: Toast["variant"] = "success") => {
-      const id = Date.now() + Math.random();
+    (title: string, description?: string, variant: Toast["variant"] = "success") => {      const id = Date.now() + Math.random();
       setToasts((prev) => [...prev.slice(-3), { id, title, description, variant }]);
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -335,16 +350,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify(data),
     });
-    if (!res?.user) return false;
+    if (!res.data?.user) return { ok: false, error: res.error ?? "Registration failed" };
     setUser({
-      name: res.user.name ?? "",
-      email: res.user.email ?? "",
-      phone: res.user.phone ?? "",
-      address: res.user.address ?? "",
-      city: res.user.city ?? "",
+      name: res.data.user.name ?? "",
+      email: res.data.user.email ?? "",
+      phone: res.data.user.phone ?? "",
+      address: res.data.user.address ?? "",
+      city: res.data.user.city ?? "",
     });
-    localStorage.setItem("rilito-session", JSON.stringify({ email: res.user.email }));
-    return true;
+    localStorage.setItem("rilito-session", JSON.stringify({ email: res.data.user.email }));
+    return { ok: true, error: null };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -352,16 +367,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    if (!res?.user) return false;
+    if (!res.data?.user) return { ok: false, error: res.error ?? "Login failed" };
     setUser({
-      name: res.user.name ?? "",
-      email: res.user.email ?? "",
-      phone: res.user.phone ?? "",
-      address: res.user.address ?? "",
-      city: res.user.city ?? "",
+      name: res.data.user.name ?? "",
+      email: res.data.user.email ?? "",
+      phone: res.data.user.phone ?? "",
+      address: res.data.user.address ?? "",
+      city: res.data.user.city ?? "",
     });
-    localStorage.setItem("rilito-session", JSON.stringify({ email: res.user.email }));
-    return true;
+    localStorage.setItem("rilito-session", JSON.stringify({ email: res.data.user.email }));
+    return { ok: true, error: null };
   }, []);
 
   const logout = useCallback(() => {
@@ -380,15 +395,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
-    if (!res?.user) return false;
+    if (!res.data?.user) return { ok: false, error: res.error ?? "Login failed" };
     setIsAdmin(true);
     setAdminUser({
-      id: String(res.user._id ?? res.user.id ?? ""),
-      name: res.user.name ?? "",
-      email: res.user.email ?? "",
-      role: res.user.role === "superadmin" ? "superadmin" : "admin",
+      id: String(res.data.user._id ?? res.data.user.id ?? ""),
+      name: res.data.user.name ?? "",
+      email: res.data.user.email ?? "",
+      role: res.data.user.role === "superadmin" ? "superadmin" : "admin",
     });
-    return true;
+    return { ok: true, error: null };
   }, []);
 
   const logoutAdmin = useCallback(() => {
@@ -405,11 +420,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         method: "POST",
         body: JSON.stringify(input),
       });
-      if (res?.user) {
-        setAdminUsers((prev) => [...prev, res.user]);
+      const created = res.data?.user;
+      if (created) {
+        setAdminUsers((prev) => [...prev, created]);
         return { ok: true };
       }
-      return { ok: false, error: res?.error ?? "Could not add user" };
+      return { ok: false, error: res.error ?? "Could not add user" };
     },
     []
   );
@@ -420,15 +436,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         `/admin/users/${id}`,
         { method: "PATCH", body: JSON.stringify(patch) }
       );
-      if (res?.user) {
-        setAdminUsers((prev) => prev.map((u) => (u.id === id ? res.user : u)));
+      const updated = res.data?.user;
+      if (updated) {
+        setAdminUsers((prev) => prev.map((u) => (u.id === id ? updated : u)));
         if (adminUser?.id === id) {
-          setAdminUser(res.user);
+          setAdminUser(updated);
           if (patch.role) setIsAdmin(true);
         }
         return { ok: true };
       }
-      return { ok: false, error: res?.error ?? "Could not update user" };
+      return { ok: false, error: res.error ?? "Could not update user" };
     },
     [adminUser]
   );
@@ -437,11 +454,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const res = await api<{ ok?: boolean; error?: string }>(`/admin/users/${id}`, {
       method: "DELETE",
     });
-    if (res?.ok) {
+    if (res.data?.ok) {
       setAdminUsers((prev) => prev.filter((u) => u.id !== id));
       return { ok: true };
     }
-    return { ok: false, error: res?.error ?? "Could not delete user" };
+    return { ok: false, error: res.error ?? "Could not delete user" };
   }, []);
 
   const saveProduct = useCallback((product: Product) => {

@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ reviews: reviews.map(toPlain) });
   } catch (err) {
     console.error("[admin/reviews GET]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -62,6 +63,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ review: toPlain(review) });
   } catch (err) {
     console.error("[admin/reviews PATCH]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

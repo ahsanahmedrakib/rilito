@@ -21,6 +21,7 @@ export function LoginForm() {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { errors },
   } = useForm<LoginValues>({
     resolver: yupResolver(loginSchema),
@@ -28,10 +29,11 @@ export function LoginForm() {
   });
 
   const submit = async (values: LoginValues) => {
-    const ok = await login(values.email.trim(), values.password);
-    if (!ok) {
+    const result = await login(values.email.trim(), values.password);
+    if (!result.ok) {
+      clearErrors();
       setError("root", {
-        message: "No account matches that email and password.",
+        message: result.error || "No account matches that email and password.",
       });
       return;
     }

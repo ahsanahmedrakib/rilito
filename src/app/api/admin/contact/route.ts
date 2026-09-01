@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     console.error("[admin/contact GET]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -47,7 +48,8 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ query: { id: String(doc._id), ...toPlain<Record<string, unknown>>(doc) } });
   } catch (err) {
     console.error("[admin/contact PATCH]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -75,6 +77,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[admin/contact DELETE]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -29,6 +29,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ user: rest });
   } catch (err) {
     console.error("[customer/me PATCH]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

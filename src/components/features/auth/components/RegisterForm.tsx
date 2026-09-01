@@ -42,7 +42,7 @@ export function RegisterForm() {
   });
 
   const submit = async (values: RegisterValues) => {
-    const ok = await registerUser({
+    const result = await registerUser({
       name: values.name.trim(),
       phone: values.phone.trim(),
       email: values.email ?? "",
@@ -50,8 +50,10 @@ export function RegisterForm() {
       address: "",
       city: "Dhaka",
     });
-    if (!ok) {
-      setError("email", { message: "This email is already registered — try signing in." });
+    if (!result.ok) {
+      setError("email", {
+        message: result.error || "This email is already registered — try signing in.",
+      });
       return;
     }
     toast("Account created!", `Welcome to Rilito, ${values.name.split(" ")[0]}`);

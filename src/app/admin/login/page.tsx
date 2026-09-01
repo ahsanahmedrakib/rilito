@@ -17,14 +17,14 @@ export default function AdminLoginPage() {
     <div className="mx-auto flex min-h-[80vh] max-w-md items-center px-4 py-12">
       <AdminLoginForm
         onLogin={async (email, password) => {
-          const ok = await loginAdmin(email, password);
-          if (ok) {
+          const result = await loginAdmin(email, password);
+          if (result.ok) {
             toast("Welcome, admin", "Signed in to the dashboard");
             router.push("/admin");
           } else {
-            toast("Sign in failed", "Check your admin credentials", "info");
+            toast("Sign in failed", result.error || "Please try again", "error");
           }
-          return ok;
+          return result;
         }}
       />
     </div>

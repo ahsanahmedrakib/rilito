@@ -16,13 +16,17 @@ const inputCls =
 export function AdminLoginForm({
   onLogin,
 }: {
-  onLogin: (email: string, password: string) => Promise<boolean>;
+  onLogin: (
+    email: string,
+    password: string
+  ) => Promise<{ ok: boolean; error: string | null }>;
 }) {
   const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
     setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<AdminLoginValues>({
     resolver: yupResolver(adminLoginSchema),
@@ -30,12 +34,15 @@ export function AdminLoginForm({
   });
 
   const submit = async (values: AdminLoginValues) => {
-    const ok = await onLogin(values.email, values.password);
-    if (!ok) {
+    const result = await onLogin(values.email, values.password);
+    if (!result.ok) {
+      clearErrors();
       setError("root", {
-        message: "Invalid admin credentials.",
+        message: result.error || "Invalid admin credentials.",
       });
+      return false;
     }
+    return true;
   };
 
   return (

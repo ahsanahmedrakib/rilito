@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ user });
   } catch (err) {
     console.error("[auth/me]", err);
-    return NextResponse.json({ user: null, error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ user: null, error: message }, { status: 500 });
   }
 }

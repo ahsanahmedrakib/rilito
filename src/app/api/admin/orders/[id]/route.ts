@@ -45,6 +45,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
     return NextResponse.json({ order: toPlain(order) });
   } catch (err) {
     console.error("[admin/orders PATCH]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

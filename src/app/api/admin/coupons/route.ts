@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ coupons: coupons.map(toPlain) });
   } catch (err) {
     console.error("[admin/coupons GET]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ coupon: toPlain(doc) }, { status: 201 });
   } catch (err) {
     console.error("[admin/coupons POST]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

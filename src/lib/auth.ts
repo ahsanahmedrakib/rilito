@@ -107,11 +107,11 @@ export async function requireAdmin(
 ): Promise<AuthedResult> {
   try {
     await connectDb();
-  } catch {
+  } catch (err) {
     return {
       ok: false,
       status: 503,
-      error: "Database unavailable. Check the MongoDB connection.",
+      error: err instanceof Error ? err.message : "Database unavailable.",
     };
   }
   const payload = await getRequestPayload(request);

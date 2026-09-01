@@ -208,6 +208,13 @@ export const TagIcon = make(
     <circle cx="7.5" cy="7.5" r="1.5" />
   </>
 );
+export const InfoIcon = make(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 8h.01" />
+    <path d="M12 11v5" />
+  </>
+);
 
 export const FacebookIcon = makeFilled(
   <path d="M14 8h3V4.5h-3c-2.5 0-4 1.8-4 4.2V11H7v3.5h3V21h3.5v-6.5h2.7l.5-3.5h-3.2V9c0-.6.3-1 .7-1z" />

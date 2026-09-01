@@ -9,6 +9,7 @@ export async function GET() {
     return NextResponse.json({ settings });
   } catch (err) {
     console.error("[settings GET]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

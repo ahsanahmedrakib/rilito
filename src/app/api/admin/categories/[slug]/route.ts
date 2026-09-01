@@ -48,7 +48,8 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
     return NextResponse.json({ category: toPlain(doc) });
   } catch (err) {
     console.error("[admin/categories PATCH]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -68,6 +69,7 @@ export async function DELETE(request: NextRequest, ctx: Ctx) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[admin/categories DELETE]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
