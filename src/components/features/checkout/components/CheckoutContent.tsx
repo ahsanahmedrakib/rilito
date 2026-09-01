@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import {
   quoteShipping,
   type PaymentMethodId,
@@ -33,7 +33,7 @@ export function CheckoutContent() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setError,
     clearErrors,
     formState: { errors },
@@ -50,7 +50,7 @@ export function CheckoutContent() {
       transactionId: "",
     },
   });
-  const phone = watch("phone");
+  const phone = useWatch({ control, name: "phone" });
   const [payment, setPayment] = useState<PaymentMethodId>("cod");
   const [discount, setDiscount] = useState(0);
   const [placing, setPlacing] = useState(false);
