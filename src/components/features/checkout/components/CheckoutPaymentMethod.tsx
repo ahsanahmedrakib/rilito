@@ -1,12 +1,9 @@
 "use client";
 
 import { CashIcon, LockIcon } from "@/components/shared/components/icons";
-import {
-  paymentMethods,
-  type PaymentMethodId,
-} from "@/features/checkout/data/checkout";
 import { useStore } from "@/lib/store";
 import { cn, formatPrice } from "@/lib/utils";
+import { paymentMethods, type PaymentMethodId } from "../data/checkout";
 
 export function CheckoutPaymentMethod({
   payment,
@@ -51,7 +48,10 @@ export function CheckoutPaymentMethod({
         <div className="mt-4 rounded-xl bg-amber-50 p-4 text-xs leading-relaxed text-amber-800">
           <p className="font-bold">
             Send <span className="uppercase">{formatPrice(total)}</span> to{" "}
-            <span className="font-bold">{settings.paymentNumber || "our payment number"}</span>.
+            <span className="font-bold">
+              {settings.paymentNumber || "our payment number"}
+            </span>
+            .
           </p>
           <p className="mt-1">{settings.paymentNote}</p>
           {settings.qrImage && (
@@ -64,8 +64,9 @@ export function CheckoutPaymentMethod({
             </div>
           )}
           <p className="mt-2">
-            Your order will be confirmed once payment is verified — our team will
-            call you on <span className="font-bold">{phone || "your number"}</span>.
+            Your order will be confirmed once payment is verified — our team
+            will call you on{" "}
+            <span className="font-bold">{phone || "your number"}</span>.
           </p>
         </div>
       )}
@@ -77,3 +78,4 @@ export function CheckoutPaymentMethod({
     </section>
   );
 }
+

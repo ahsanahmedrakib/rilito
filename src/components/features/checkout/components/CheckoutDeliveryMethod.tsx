@@ -1,7 +1,7 @@
 "use client";
 
-import { deliveryMethods, type DeliveryMethodId } from "@/features/checkout/data/checkout";
 import { cn } from "@/lib/utils";
+import { deliveryMethods, type DeliveryMethodId } from "../data/checkout";
 
 export function CheckoutDeliveryMethod({
   delivery,
@@ -24,11 +24,15 @@ export function CheckoutDeliveryMethod({
             onClick={() => onSelect(m.id)}
             className={cn(
               "rounded-2xl border-2 p-4 text-left transition",
-              delivery === m.id ? "border-brand-600 bg-brand-50" : "border-ink-200 hover:border-ink-400"
+              delivery === m.id
+                ? "border-brand-600 bg-brand-50"
+                : "border-ink-200 hover:border-ink-400",
             )}
           >
             <p className="text-sm font-bold text-ink-950">{m.title}</p>
-            <p className="mt-1 text-xs text-ink-500">{m.description(freeDelivery)}</p>
+            <p className="mt-1 text-xs text-ink-500">
+              {m.description(freeDelivery)}
+            </p>
           </button>
         ))}
       </div>
