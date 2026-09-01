@@ -17,6 +17,8 @@ const FIELDS = [
   "details",
   "sizes",
   "colors",
+  "sizeStock",
+  "sizeGuideImage",
   "tags",
   "rating",
   "reviewCount",

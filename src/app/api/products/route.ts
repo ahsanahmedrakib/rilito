@@ -20,6 +20,8 @@ export async function GET() {
       details: p.details,
       sizes: p.sizes,
       colors: p.colors,
+      sizeStock: p.sizeStock,
+      sizeGuideImage: p.sizeGuideImage,
       tags: p.tags,
       rating: p.rating,
       reviewCount: p.reviewCount,

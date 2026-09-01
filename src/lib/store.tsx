@@ -290,10 +290,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         if (adminOrders?.data?.orders?.length) setOrders(adminOrders.data.orders);
         else setOrders(readLS("rilito-orders", []));
 
-        const usersRes = await api<{ users: AdminAccount[] }>("/admin/users");
+        const [adminProductsRes, usersRes, contactRes] = await Promise.all([
+          api<{ products: Product[] }>("/admin/products?deleted=true"),
+          api<{ users: AdminAccount[] }>("/admin/users"),
+          api<{ queries: ContactQuery[] }>("/admin/contact"),
+        ]);
+        if (adminProductsRes.data?.products?.length)
+          setProducts(adminProductsRes.data.products);
         if (usersRes.data?.users) setAdminUsers(usersRes.data.users);
-
-        const contactRes = await api<{ queries: ContactQuery[] }>("/admin/contact");
         if (contactRes.data?.queries) setContactQueries(contactRes.data.queries);
       } else {
         setOrders(readLS("rilito-orders", []));
