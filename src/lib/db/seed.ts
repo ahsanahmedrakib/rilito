@@ -1,7 +1,18 @@
 import { Category, Coupon, Product, Review, Setting, connectDb } from "./models";
 import type mongoose from "mongoose";
-import { categories as seedCategories, allProducts } from "@/lib/data";
+import {
+  allProducts,
+  blogPosts,
+  categories as seedCategories,
+  editorialBanner,
+  faqs,
+  homeTestimonials,
+  homeValues,
+  newsletterDefault,
+  pageContents,
+} from "@/lib/data";
 import { defaultCoupons } from "@/lib/coupons";
+import type { AppSettings } from "@/lib/types";
 
 const SETTING_KEYS = [
   "qrImage",
@@ -11,6 +22,13 @@ const SETTING_KEYS = [
   "freeShippingThreshold",
   "marqueeTexts",
   "heroSlides",
+  "homeValues",
+  "testimonials",
+  "editorialBanner",
+  "blogPosts",
+  "pageContents",
+  "faqs",
+  "newsletter",
 ] as const;
 
 export const DEFAULT_HERO_SLIDES = [
@@ -52,7 +70,7 @@ export const DEFAULT_HERO_SLIDES = [
   },
 ];
 
-const SETTING_DEFAULTS: Record<(typeof SETTING_KEYS)[number], unknown> = {
+const SETTING_DEFAULTS: AppSettings = {
   qrImage: "",
   paymentNumber: "01611-773755",
   paymentNote: "Send to this number and keep the transaction ID.",
@@ -65,6 +83,13 @@ const SETTING_DEFAULTS: Record<(typeof SETTING_KEYS)[number], unknown> = {
     "7-DAY EASY EXCHANGE ON ALL ORDERS",
   ],
   heroSlides: DEFAULT_HERO_SLIDES,
+  homeValues,
+  testimonials: homeTestimonials,
+  editorialBanner,
+  blogPosts,
+  pageContents,
+  faqs,
+  newsletter: newsletterDefault,
 };
 
 /** Seed defaults only when collections are empty. Safe to call repeatedly. */
@@ -150,7 +175,7 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
   return doc ? (doc.value as T) : fallback;
 }
 
-export async function readSettings() {
+export async function readSettings(): Promise<AppSettings> {
   const [
     qrImage,
     paymentNumber,
@@ -159,6 +184,13 @@ export async function readSettings() {
     freeShippingThreshold,
     marqueeTexts,
     heroSlides,
+    homeValuesValue,
+    testimonialsValue,
+    editorialBannerValue,
+    blogPostsValue,
+    pageContentsValue,
+    faqsValue,
+    newsletterValue,
   ] = await Promise.all([
     getSetting<string>("qrImage", ""),
     getSetting<string>("paymentNumber", "01611-773755"),
@@ -179,6 +211,13 @@ export async function readSettings() {
       "heroSlides",
       DEFAULT_HERO_SLIDES
     ),
+    getSetting("homeValues", SETTING_DEFAULTS.homeValues),
+    getSetting("testimonials", SETTING_DEFAULTS.testimonials),
+    getSetting("editorialBanner", SETTING_DEFAULTS.editorialBanner),
+    getSetting("blogPosts", SETTING_DEFAULTS.blogPosts),
+    getSetting("pageContents", SETTING_DEFAULTS.pageContents),
+    getSetting("faqs", SETTING_DEFAULTS.faqs),
+    getSetting("newsletter", SETTING_DEFAULTS.newsletter),
   ]);
   return {
     qrImage,
@@ -188,5 +227,22 @@ export async function readSettings() {
     freeShippingThreshold,
     marqueeTexts,
     heroSlides,
+    homeValues: homeValuesValue,
+    testimonials: testimonialsValue,
+    editorialBanner: editorialBannerValue,
+    blogPosts: blogPostsValue,
+    pageContents: pageContentsValue,
+    faqs: faqsValue,
+    newsletter: newsletterValue,
   };
+}
+
+/** Read site settings, falling back to static defaults if the DB is unreachable. */
+export async function readSettingsSafely(): Promise<AppSettings> {
+  try {
+    return await readSettings();
+  } catch (err) {
+    console.error("[readme settings]", err);
+    return SETTING_DEFAULTS;
+  }
 }

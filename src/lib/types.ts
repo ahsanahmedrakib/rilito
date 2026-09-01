@@ -64,6 +64,58 @@ export interface BlogPost {
   content: string[];
 }
 
+export type HomeValueIcon = "truck" | "cash" | "refresh" | "shield";
+
+export interface HomeValue {
+  icon: HomeValueIcon;
+  title: string;
+  text: string;
+}
+
+export interface HomeTestimonial {
+  name: string;
+  role: string;
+  text: string;
+  initials: string;
+  /** Optional star rating (1-5). Defaults to 5 when absent. */
+  rating?: number;
+}
+
+export interface EditorialBanner {
+  eyebrow: string;
+  /** Title lines separated by "\n" to support multi-line headings. */
+  title: string;
+  subtitle: string;
+  image: string;
+  primaryCta: { label: string; href: string };
+  secondaryCta: { label: string; href: string };
+}
+
+export interface Faq {
+  question: string;
+  answer: string;
+}
+
+export interface PageSection {
+  heading: string;
+  body: string[];
+}
+
+export interface PageContent {
+  title: string;
+  sections: PageSection[];
+}
+
+export interface NewsletterContent {
+  title: string;
+  subtitle: string;
+  placeholder: string;
+  buttonLabel: string;
+  codeIntro: string;
+  codeValue: string;
+  codeOutro: string;
+}
+
 export interface CartItem {
   key: string;
   productId: string;
@@ -128,6 +180,20 @@ export interface AppSettings {
   marqueeTexts: string[];
   /** Hero banner slides shown on the public home page. */
   heroSlides: HeroSlide[];
+  /** Value propositions shown below the home hero slider. */
+  homeValues: HomeValue[];
+  /** Customer testimonials shown on the home page. */
+  testimonials: HomeTestimonial[];
+  /** "The Rilito Edit" editorial banner on the home page. */
+  editorialBanner: EditorialBanner;
+  /** Blog posts powering the blog index, detail pages and home section. */
+  blogPosts: BlogPost[];
+  /** Static info pages (about, privacy, terms, returns, delivery, booking…). */
+  pageContents: Record<string, PageContent>;
+  /** FAQ entries shown on the /pages/faq page. */
+  faqs: Faq[];
+  /** Marketing copy for the newsletter signup section on the home page. */
+  newsletter: NewsletterContent;
 }
 
 export interface HeroSlide {

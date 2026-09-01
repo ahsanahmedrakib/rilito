@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ArrowRight } from "@/components/shared/components/icons";
 import { SITE_URL } from "@/components/shared/data/site";
-import { blogPosts } from "@/lib/data";
+import { readSettingsSafely } from "@/lib/db/seed";
 import { formatDate } from "@/lib/utils";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -14,7 +14,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const settings = await readSettingsSafely();
+  const post = settings.blogPosts?.find((p) => p.slug === slug);
   if (!post) return { title: "Post not found — Rilito" };
   return {
     title: post.title,
@@ -45,10 +46,13 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const settings = await readSettingsSafely();
+  const post = settings.blogPosts?.find((p) => p.slug === slug);
   if (!post) notFound();
 
-  const more = blogPosts.filter((p) => p.slug !== slug).slice(0, 2);
+  const more = settings.blogPosts
+    .filter((p) => p.slug !== slug)
+    .slice(0, 2);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-10 md:px-6 lg:px-8">

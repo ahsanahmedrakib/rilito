@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ChevronRight } from "@/components/shared/components/icons";
-import { faqs, pageContents } from "@/lib/data";
+import { readSettingsSafely } from "@/lib/db/seed";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -16,7 +16,8 @@ export async function generateMetadata({
       description: "Answers to common questions about Rilito orders, sizing, delivery and returns.",
       alternates: { canonical: `/pages/faq` },
     };
-  const page = pageContents[slug];
+  const settings = await readSettingsSafely();
+  const page = settings.pageContents?.[slug];
   if (!page) return { title: "Page not found — Rilito" };
   return {
     title: page.title,
@@ -32,6 +33,8 @@ export default async function Page({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const settings = await readSettingsSafely();
+  const { faqs, pageContents } = settings;
 
   if (slug === "faq") {
     return (
@@ -68,7 +71,7 @@ export default async function Page({
     );
   }
 
-  const page = pageContents[slug];
+  const page = pageContents?.[slug];
   if (!page) notFound();
 
   return (

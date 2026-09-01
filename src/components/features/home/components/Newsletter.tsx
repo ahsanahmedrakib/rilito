@@ -5,7 +5,8 @@ import { useStore } from "@/lib/store";
 import { useState } from "react";
 
 export function Newsletter() {
-  const { toast } = useStore();
+  const { toast, settings } = useStore();
+  const { newsletter } = settings;
   const [email, setEmail] = useState("");
 
   const submit = (e: React.FormEvent) => {
@@ -36,11 +37,10 @@ export function Newsletter() {
           <MailIcon className="h-7 w-7" />
         </div>
         <h2 className="mt-5 text-2xl font-extrabold uppercase tracking-tight text-white md:text-4xl">
-          Get 10% Off Your First Order
+          {newsletter.title}
         </h2>
         <p className="mt-3 text-sm text-ink-300 md:text-base">
-          Join the Rilito insider list — early access to drops, private sales
-          and styling tips. No spam, ever.
+          {newsletter.subtitle}
         </p>
         <form
           onSubmit={submit}
@@ -50,20 +50,22 @@ export function Newsletter() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email address"
+            placeholder={newsletter.placeholder}
             className="flex-1 rounded-full border border-white/15 bg-white/10 px-5 py-3.5 text-sm text-white outline-none backdrop-blur placeholder:text-ink-400 focus:border-brand-500"
           />
           <button
             type="submit"
             className="rounded-full bg-brand-600 px-7 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
           >
-            Subscribe
+            {newsletter.buttonLabel}
           </button>
         </form>
         <p className="mt-4 text-xs text-ink-400">
-          Use code{" "}
-          <span className="font-mono font-bold text-brand-400">RILITO10</span>{" "}
-          at checkout
+          {newsletter.codeIntro}{" "}
+          <span className="font-mono font-bold text-brand-400">
+            {newsletter.codeValue}
+          </span>{" "}
+          {newsletter.codeOutro}
         </p>
       </div>
     </section>

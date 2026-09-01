@@ -1,14 +1,22 @@
 "use client";
 
+import {
+  EyeIcon,
+  EyeOffIcon,
+  LockIcon,
+  UserIcon,
+} from "@/components/shared/components/icons";
+import {
+  loginSchema,
+  type LoginValues,
+} from "@/features/auth/data/authSchemas";
+import { useStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { loginSchema, type LoginValues } from "@/features/auth/data/authSchemas";
-import { useStore } from "@/lib/store";
-import { EyeIcon, EyeOffIcon, LockIcon, UserIcon } from "@/components/shared/components/icons";
-import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
 
 const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white px-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-ink-400 focus:border-ink-950";
@@ -79,7 +87,11 @@ export function LoginForm() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Your password"
-              className={cn(inputCls, "pl-11 pr-12", errors.password && "border-red-400")}
+              className={cn(
+                inputCls,
+                "pl-11 pr-12",
+                errors.password && "border-red-400",
+              )}
               {...register("password")}
             />
             <button
@@ -88,7 +100,11 @@ export function LoginForm() {
               aria-label={showPassword ? "Hide password" : "Show password"}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 transition hover:text-ink-900"
             >
-              {showPassword ? <EyeOffIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+              {showPassword ? (
+                <EyeOffIcon className="h-5 w-5" />
+              ) : (
+                <EyeIcon className="h-5 w-5" />
+              )}
             </button>
           </div>
           {errors.password && (
@@ -99,14 +115,17 @@ export function LoginForm() {
         </div>
 
         {errors.root && (
-          <p className="rounded-xl bg-red-50 px-4 py-3 text-xs font-semibold text-red-700" role="alert">
+          <p
+            className="rounded-xl bg-red-50 px-4 py-3 text-xs font-semibold text-red-700"
+            role="alert"
+          >
             {errors.root.message}
           </p>
         )}
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-brand-600 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
+          className="cursor-pointer w-full rounded-xl bg-brand-600 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
         >
           Sign In
         </button>
@@ -114,7 +133,10 @@ export function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-ink-500">
         New to Rilito?{" "}
-        <Link href="/register" className="font-bold text-brand-700 hover:text-brand-800">
+        <Link
+          href="/register"
+          className="font-bold text-brand-700 hover:text-brand-800"
+        >
           Create an account
         </Link>
       </p>

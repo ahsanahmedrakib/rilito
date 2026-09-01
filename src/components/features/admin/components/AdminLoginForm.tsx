@@ -109,7 +109,7 @@ export function AdminLoginForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-xl bg-ink-950 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-600 disabled:opacity-60"
+          className="w-full rounded-xl cursor-pointer bg-ink-950 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-600 disabled:opacity-60"
         >
           {isSubmitting ? "Signing in..." : "Sign In"}
         </button>

@@ -1,9 +1,39 @@
 import { SITE_URL } from "@/components/shared/data/site";
-import { allProducts, blogPosts, categories, pageContents } from "@/lib/data";
+import { Category, Product, connectDb } from "@/lib/db/models";
+import { readSettingsSafely } from "@/lib/db/seed";
+import {
+  allProducts,
+  blogPosts as staticBlogPosts,
+  categories as staticCategories,
+  pageContents as staticPageContents,
+} from "@/lib/data";
 import type { MetadataRoute } from "next";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+
+  const settings = await readSettingsSafely();
+  const blogRoutesData = settings.blogPosts?.length
+    ? settings.blogPosts
+    : staticBlogPosts;
+  const pageRoutesData = settings.pageContents &&
+    Object.keys(settings.pageContents).length
+    ? settings.pageContents
+    : staticPageContents;
+
+  let categoriesRoutesData: { slug: string }[] = staticCategories;
+  let productsRoutesData: { slug: string }[] = allProducts;
+  try {
+    await connectDb();
+    const dbCategories = await Category.find().lean().exec();
+    if (dbCategories.length) categoriesRoutesData = dbCategories;
+    const dbProducts = await Product.find({ deleted: { $ne: true } })
+      .lean()
+      .exec();
+    if (dbProducts.length) productsRoutesData = dbProducts;
+  } catch {
+    // fall back to static data if DB is unreachable
+  }
 
   const staticRoutes = [
     "",
@@ -25,28 +55,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: route === "" ? 1 : 0.8,
   }));
 
-  const categoryRoutes = categories.map((c) => ({
+  const categoryRoutes = categoriesRoutesData.map((c) => ({
     url: `${SITE_URL}/category/${c.slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.7,
   }));
 
-  const productRoutes = allProducts.map((p) => ({
+  const productRoutes = productsRoutesData.map((p) => ({
     url: `${SITE_URL}/product/${p.slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.6,
   }));
 
-  const blogRoutes = blogPosts.map((post) => ({
+  const blogRoutes = blogRoutesData.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
     lastModified: new Date(post.date),
     changeFrequency: "monthly" as const,
     priority: 0.5,
   }));
 
-  const pageRoutes = Object.keys(pageContents).map((slug) => ({
+  const pageRoutes = Object.keys(pageRoutesData).map((slug) => ({
     url: `${SITE_URL}/pages/${slug}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

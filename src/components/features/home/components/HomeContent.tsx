@@ -13,61 +13,47 @@ import { SiteSkeleton } from "@/components/shared/components/SiteSkeleton";
 import { HeroSlider } from "@/features/home/components/HeroSlider";
 import { Newsletter } from "@/features/home/components/Newsletter";
 import { ProductScroller } from "@/features/product/components/ProductScroller";
-import { blogPosts, categories } from "@/lib/data";
 import { useStore } from "@/lib/store";
+import type { HomeValueIcon } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 
-const values = [
-  {
-    icon: TruckIcon,
-    title: "Fast Nationwide Delivery",
-    text: "1-3 days inside Dhaka. Free on orders over ৳2,000.",
-  },
-  {
-    icon: CashIcon,
-    title: "Cash on Delivery",
-    text: "Inspect your parcel, then pay. Simple and safe.",
-  },
-  {
-    icon: RefreshIcon,
-    title: "7-Day Easy Exchange",
-    text: "Wrong size? We swap it for free within a week.",
-  },
-  {
-    icon: ShieldIcon,
-    title: "100% Authentic",
-    text: "Every stitch quality-checked before it ships.",
-  },
-];
+const valueIcons: Record<
+  HomeValueIcon,
+  (props: { className?: string }) => React.ReactNode
+> = {
+  truck: TruckIcon,
+  cash: CashIcon,
+  refresh: RefreshIcon,
+  shield: ShieldIcon,
+};
 
-const testimonials = [
-  {
-    name: "Tanvir Ahmed",
-    role: "Verified buyer · T-Shirts",
-    text: "The oversized tee is better than imported brands at twice the price. Wash after wash, the collar stays perfect.",
-    initials: "TA",
-  },
-  {
-    name: "Sabbir Rahman",
-    role: "Verified buyer · Panjabi",
-    text: "Bought the Katkono panjabi for Eid. The cut, the fabric, the fit — I got more compliments than I could count.",
-    initials: "SR",
-  },
-  {
-    name: "Nafis Islam",
-    role: "Verified buyer · Winter",
-    text: "Quilted bomber arrived in 2 days, COD. Warm, sharp, and the size guide was spot on. Already ordered the puffer.",
-    initials: "NI",
-  },
-];
+function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 export default function HomeContent() {
-  const { products, ready } = useStore();
+  const { products, categories, settings, reviews: allReviews, ready } = useStore();
+  const { homeValues, testimonials, blogPosts, editorialBanner } = settings;
   const bestSellers = products.filter((p) => p.isBestSeller);
   const newArrivals = products.filter((p) => p.isNew);
-  const byCategory = (slug: string) => products.filter((p) => p.category === slug);
+  const byCategory = (slug: string) =>
+    products.filter((p) => p.category === slug);
+
+  const approvedReviews = allReviews.filter((r) => r.status === "approved");
+  const reviewTestimonials = approvedReviews.map((r) => ({
+    name: r.author,
+    role: `Verified buyer · ${r.productName || "Rilito"}`,
+    text: r.body || r.title || "",
+    initials: initialsOf(r.author),
+    rating: r.rating,
+  }));
+  const displayTestimonials =
+    reviewTestimonials.length >= 3 ? reviewTestimonials.slice(0, 3) : testimonials;
 
   if (!ready) return <SiteSkeleton />;
 
@@ -77,22 +63,25 @@ export default function HomeContent() {
 
       <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {values.map((v) => (
-            <div
-              key={v.title}
-              className="group flex items-start gap-4 rounded-2xl bg-white p-5 ring-1 ring-ink-200/60"
-            >
-              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-ink-950 text-brand-500 transition group-hover:bg-brand-600 group-hover:text-white">
-                <v.icon className="h-6 w-6" />
+          {homeValues.map((v) => {
+            const Icon = valueIcons[v.icon] ?? ShieldIcon;
+            return (
+              <div
+                key={v.title}
+                className="group flex items-start gap-4 rounded-2xl bg-white p-5 ring-1 ring-ink-200/60"
+              >
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-ink-950 text-brand-500 transition group-hover:bg-brand-600 group-hover:text-white">
+                  <Icon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-ink-950">{v.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-ink-500">
+                    {v.text}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-ink-950">{v.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-ink-500">
-                  {v.text}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -110,11 +99,11 @@ export default function HomeContent() {
               href={`/category/${c.slug}`}
               className={`group relative overflow-hidden rounded-2xl ${
                 i < 2
-                  ? "col-span-2 aspect-[16/10] md:col-span-2"
+                  ? "col-span-2 aspect-16/10 md:col-span-2"
                   : i === 2
-                    ? "aspect-[16/10] md:col-span-1"
+                    ? "aspect-16/10 md:col-span-1"
                     : "aspect-square"
-              } ${i === 0 || i === 1 ? "md:aspect-[16/10]" : ""}`}
+              } ${i === 0 || i === 1 ? "md:aspect-16/10" : ""}`}
             >
               <Image
                 src={c.image}
@@ -123,7 +112,7 @@ export default function HomeContent() {
                 sizes="(max-width: 768px) 50vw, 20vw"
                 className="object-cover transition duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-ink-950/20 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-ink-950/80 via-ink-950/20 to-transparent" />
               <div className="absolute inset-0 flex flex-col justify-end p-4">
                 <h3 className="text-lg font-extrabold uppercase tracking-tight text-white md:text-xl">
                   {c.name}
@@ -153,40 +142,36 @@ export default function HomeContent() {
 
       <section className="relative mt-10 overflow-hidden bg-ink-950">
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:px-6 lg:px-8">
-          <div className="relative order-2 aspect-[4/3] overflow-hidden rounded-3xl md:order-1">
+          <div className="relative order-2 aspect-4/3 overflow-hidden rounded-3xl md:order-1">
             <Image
-              src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1000&q=80"
-              alt="Panjabi collection"
+              src={editorialBanner.image}
+              alt={editorialBanner.title}
               fill
               className="object-cover"
             />
           </div>
           <div className="order-1 md:order-1">
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-brand-400">
-              The Rilito Edit
+              {editorialBanner.eyebrow}
             </p>
-            <h2 className="mt-3 text-3xl font-black uppercase leading-tight tracking-tight text-white md:text-5xl">
-              From Eid Day To
-              <br />
-              Everyday
+            <h2 className="mt-3 whitespace-pre-line text-3xl font-black uppercase leading-tight tracking-tight text-white md:text-5xl">
+              {editorialBanner.title}
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-300 md:text-base">
-              Panjabi that moves from the prayer mat to the family photo without
-              missing a beat. Classic cottons for the midday sun, silk blends
-              for the evening sessions.
+              {editorialBanner.subtitle}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
-                href="/category/panjabi"
+                href={editorialBanner.primaryCta.href}
                 className="rounded-full bg-brand-600 px-7 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-brand-700"
               >
-                Shop Panjabi
+                {editorialBanner.primaryCta.label}
               </Link>
               <Link
-                href="/products?category=combo"
+                href={editorialBanner.secondaryCta.href}
                 className="rounded-full border border-white/30 px-7 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-white hover:text-ink-950"
               >
-                View Combo Packs
+                {editorialBanner.secondaryCta.label}
               </Link>
             </div>
           </div>
@@ -218,7 +203,7 @@ export default function HomeContent() {
               <SectionHeading
                 align="left"
                 eyebrow={idx === 0 ? "Editor's Picks" : undefined}
-                title={cat.name}
+                title={cat?.name}
                 link={`/category/${catSlug}`}
               />
               <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
@@ -228,7 +213,7 @@ export default function HomeContent() {
                     <Link
                       key={p.id}
                       href={`/product/${p.slug}`}
-                      className="group relative aspect-[3/4] overflow-hidden rounded-2xl bg-ink-100"
+                      className="group relative aspect-3/4 overflow-hidden rounded-2xl bg-ink-100"
                     >
                       <Image
                         src={p.images[0]}
@@ -237,7 +222,7 @@ export default function HomeContent() {
                         sizes="(max-width: 768px) 50vw, 20vw"
                         className="object-cover transition duration-500 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-transparent to-transparent opacity-90" />
+                      <div className="absolute inset-0 bg-linear-to-t from-ink-950/85 via-transparent to-transparent opacity-90" />
                       <div className="absolute inset-x-0 bottom-0 p-4">
                         <p className="text-sm font-bold text-white">{p.name}</p>
                         <p className="mt-0.5 text-sm font-semibold text-white">
@@ -258,7 +243,7 @@ export default function HomeContent() {
                     40%<span className="text-brand-500">Off</span>
                   </p>
                   <p className="mt-3 text-sm text-ink-300">
-                    on this season&rsquo;s {cat.name.toLowerCase()}
+                    on this season&rsquo;s {cat?.name.toLowerCase()}
                   </p>
                   <Link
                     href={`/category/${catSlug}`}
@@ -280,14 +265,17 @@ export default function HomeContent() {
           description="Real reviews from real deliveries — no ghosts, no filters."
         />
         <div className="grid gap-4 md:grid-cols-3">
-          {testimonials.map((t) => (
+          {displayTestimonials.map((t) => (
             <figure
               key={t.name}
               className="flex flex-col rounded-2xl bg-white p-6 ring-1 ring-ink-200/60"
             >
               <div className="flex text-amber-500">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <StarFilledIcon key={i} className="h-4 w-4" />
+                  <StarFilledIcon
+                    key={i}
+                    className={`h-4 w-4 ${i < (t.rating ?? 5) ? "" : "text-ink-200"}`}
+                  />
                 ))}
               </div>
               <blockquote className="mt-4 flex-1 text-sm leading-relaxed text-ink-700">
@@ -321,7 +309,7 @@ export default function HomeContent() {
               href={`/blog/${post.slug}`}
               className="group overflow-hidden rounded-2xl bg-white ring-1 ring-ink-200/60 transition hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="relative aspect-[16/10] overflow-hidden bg-ink-100">
+              <div className="relative aspect-16/10 overflow-hidden bg-ink-100">
                 <Image
                   src={post.image}
                   alt={post.title}
@@ -355,3 +343,4 @@ export default function HomeContent() {
     </>
   );
 }
+

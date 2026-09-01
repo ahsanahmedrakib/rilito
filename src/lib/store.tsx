@@ -23,7 +23,17 @@ import type {
   User,
 } from "./types";
 import { defaultCoupons } from "./coupons";
-import { allProducts, categories as defaultCategories } from "./data";
+import {
+  allProducts,
+  blogPosts,
+  categories as defaultCategories,
+  editorialBanner,
+  faqs,
+  homeTestimonials,
+  homeValues,
+  newsletterDefault,
+  pageContents,
+} from "./data";
 
 export interface AdminAccount {
   id: string;
@@ -228,6 +238,13 @@ const defaultSettings: AppSettings = {
     "7-DAY EASY EXCHANGE ON ALL ORDERS",
   ],
   heroSlides: defaultHeroSlides,
+  homeValues,
+  testimonials: homeTestimonials,
+  editorialBanner,
+  blogPosts,
+  pageContents,
+  faqs,
+  newsletter: newsletterDefault,
 };
 
 export function StoreProvider({ children }: { children: ReactNode }) {

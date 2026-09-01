@@ -11,6 +11,7 @@ import { useEffect, useState, type ReactNode } from "react";
 const nav = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/categories", label: "Categories" },
+  { href: "/admin/content", label: "Content" },
   { href: "/admin/contact", label: "Contact" },
   { href: "/admin/coupons", label: "Coupons" },
   { href: "/admin/hero-slides", label: "Hero Slides" },

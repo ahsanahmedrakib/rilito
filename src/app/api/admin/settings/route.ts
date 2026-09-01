@@ -32,24 +32,33 @@ export async function PATCH(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
-    const keys: { key: string; isArray: boolean }[] = [
-      { key: "qrImage", isArray: false },
-      { key: "paymentNumber", isArray: false },
-      { key: "paymentNote", isArray: false },
-      { key: "shippingFee", isArray: false },
-      { key: "freeShippingThreshold", isArray: false },
-      { key: "marqueeTexts", isArray: true },
-      { key: "heroSlides", isArray: true },
+    const keys: { key: string; type: "string" | "number" | "array" | "raw" }[] = [
+      { key: "qrImage", type: "string" },
+      { key: "paymentNumber", type: "string" },
+      { key: "paymentNote", type: "string" },
+      { key: "shippingFee", type: "number" },
+      { key: "freeShippingThreshold", type: "number" },
+      { key: "marqueeTexts", type: "array" },
+      { key: "heroSlides", type: "raw" },
+      { key: "homeValues", type: "raw" },
+      { key: "testimonials", type: "raw" },
+      { key: "editorialBanner", type: "raw" },
+      { key: "blogPosts", type: "raw" },
+      { key: "pageContents", type: "raw" },
+      { key: "faqs", type: "raw" },
+      { key: "newsletter", type: "raw" },
     ];
-    for (const { key, isArray } of keys) {
+    for (const { key, type } of keys) {
       if (body[key] !== undefined) {
         let value: unknown;
-        if (isArray) {
+        if (type === "array") {
           value = Array.isArray(body[key]) ? body[key] : [body[key]];
-        } else if (key === "shippingFee" || key === "freeShippingThreshold") {
+        } else if (type === "number") {
           value = Number(body[key]) || 0;
-        } else {
+        } else if (type === "string") {
           value = String(body[key]);
+        } else {
+          value = body[key];
         }
         await Setting.updateOne(
           { key },

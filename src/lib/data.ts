@@ -1,4 +1,12 @@
-import type { BlogPost, Category, Product } from "./types";
+import type {
+  BlogPost,
+  Category,
+  EditorialBanner,
+  HomeTestimonial,
+  HomeValue,
+  NewsletterContent,
+  Product,
+} from "./types";
 
 const img = (id: string) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=900&q=80`;
@@ -1026,6 +1034,63 @@ export function searchProducts(query: string): Product[] {
   });
 }
 
+export const homeValues: HomeValue[] = [
+  {
+    icon: "truck",
+    title: "Fast Nationwide Delivery",
+    text: "1-3 days inside Dhaka. Free on orders over ৳2,000.",
+  },
+  {
+    icon: "cash",
+    title: "Cash on Delivery",
+    text: "Inspect your parcel, then pay. Simple and safe.",
+  },
+  {
+    icon: "refresh",
+    title: "7-Day Easy Exchange",
+    text: "Wrong size? We swap it for free within a week.",
+  },
+  {
+    icon: "shield",
+    title: "100% Authentic",
+    text: "Every stitch quality-checked before it ships.",
+  },
+];
+
+export const homeTestimonials: HomeTestimonial[] = [
+  {
+    name: "Tanvir Ahmed",
+    role: "Verified buyer · T-Shirts",
+    text: "The oversized tee is better than imported brands at twice the price. Wash after wash, the collar stays perfect.",
+    initials: "TA",
+  },
+  {
+    name: "Sabbir Rahman",
+    role: "Verified buyer · Panjabi",
+    text: "Bought the Katkono panjabi for Eid. The cut, the fabric, the fit — I got more compliments than I could count.",
+    initials: "SR",
+  },
+  {
+    name: "Nafis Islam",
+    role: "Verified buyer · Winter",
+    text: "Quilted bomber arrived in 2 days, COD. Warm, sharp, and the size guide was spot on. Already ordered the puffer.",
+    initials: "NI",
+  },
+];
+
+export const editorialBanner: EditorialBanner = {
+  eyebrow: "The Rilito Edit",
+  title: "From Eid Day To\nEveryday",
+  subtitle:
+    "Panjabi that moves from the prayer mat to the family photo without missing a beat. Classic cottons for the midday sun, silk blends for the evening sessions.",
+  image: img("1490481651871-ab68de25d43d"),
+  primaryCta: { label: "Shop Panjabi", href: "/category/panjabi" },
+  secondaryCta: {
+    label: "View Combo Packs",
+    href: "/products?category=combo",
+  },
+};
+
 export const blogPosts: BlogPost[] = [
   {
     slug: "how-to-pick-the-perfect-panjabi",
@@ -1096,6 +1161,17 @@ export const blogPosts: BlogPost[] = [
     ],
   },
 ];
+
+export const newsletterDefault: NewsletterContent = {
+  title: "Get 10% Off Your First Order",
+  subtitle:
+    "Join the Rilito insider list — early access to drops, private sales and styling tips. No spam, ever.",
+  placeholder: "Enter your email address",
+  buttonLabel: "Subscribe",
+  codeIntro: "Use code",
+  codeValue: "RILITO10",
+  codeOutro: "at checkout",
+};
 
 export const faqs: { question: string; answer: string }[] = [
   {
