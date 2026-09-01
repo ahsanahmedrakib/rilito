@@ -11,8 +11,8 @@ export function LoadingLogo({
   return (
     <div className={cn("flex flex-col items-center justify-center", className)}>
       <div className="relative grid place-items-center">
-        <span className="absolute h-20 w-20 rounded-full border-2 border-transparent border-t-brand-600 animate-logo-spin" />
-        <span className="absolute inset-0 -m-1 rounded-full bg-brand-600/10 animate-logo-breathe" />
+        <span className="absolute h-20 w-20 border-2 border-transparent border-t-brand-600 animate-logo-spin" />
+        <span className="absolute inset-0 -m-1 bg-brand-600/10 animate-logo-breathe" />
         <LogoMark className="relative h-16 w-16 animate-logo-pulse" />
       </div>
       {label && (
@@ -23,3 +23,4 @@ export function LoadingLogo({
     </div>
   );
 }
+

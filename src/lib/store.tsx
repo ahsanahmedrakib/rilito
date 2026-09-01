@@ -16,6 +16,7 @@ import type {
   Category,
   ContactQuery,
   Coupon,
+  HeroSlide,
   Order,
   Product,
   Review,
@@ -104,6 +105,9 @@ interface StoreContextValue {
   setReviewStatus: (id: string, status: Review["status"]) => void;
   settings: AppSettings;
   saveSettings: (patch: Partial<AppSettings>) => void;
+  saveHeroSlide: (slide: HeroSlide) => void;
+  deleteHeroSlide: (id: string) => void;
+  reorderHeroSlide: (id: string, dir: -1 | 1) => void;
   coupons: Coupon[];
   saveCoupon: (coupon: Coupon) => void;
   deleteCoupon: (code: string) => void;
@@ -165,6 +169,52 @@ async function api<T>(
   }
 }
 
+function persistHeroSlides(heroSlides: HeroSlide[]) {
+  api("/admin/settings", {
+    method: "PATCH",
+    body: JSON.stringify({ heroSlides }),
+  });
+}
+
+const defaultHeroSlides: HeroSlide[] = [
+  {
+    id: "slide-tshirts",
+    image:
+      "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "New Season · Street & Classic",
+    title: "Wear The Moment",
+    subtitle:
+      "Heavyweight tees, sharp shirts and relaxed fits — cut for the way you actually dress.",
+    cta: { href: "/category/t-shirts", label: "Shop T-Shirts" },
+    order: 1,
+    active: true,
+  },
+  {
+    id: "slide-panjabi",
+    image:
+      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "Panjabi · Eid & Beyond",
+    title: "Elegance In Every Thread",
+    subtitle:
+      "From classic cotton to intricate embroidery, find the panjabi that carries the occasion.",
+    cta: { href: "/category/panjabi", label: "Explore Panjabi" },
+    order: 2,
+    active: true,
+  },
+  {
+    id: "slide-winter",
+    image:
+      "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "Winter Drop · Up to 40% Off",
+    title: "Bundle Up In Style",
+    subtitle:
+      "Quilted bombers, puffer jackets and cosy knits that handle the cold without hiding your look.",
+    cta: { href: "/category/winter", label: "Shop Winter" },
+    order: 3,
+    active: true,
+  },
+];
+
 const defaultSettings: AppSettings = {
   qrImage: "",
   paymentNumber: "01611-773755",
@@ -175,6 +225,7 @@ const defaultSettings: AppSettings = {
     "CASH ON DELIVERY ACROSS BANGLADESH",
     "7-DAY EASY EXCHANGE ON ALL ORDERS",
   ],
+  heroSlides: defaultHeroSlides,
 };
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -567,6 +618,52 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     api("/admin/settings", { method: "PATCH", body: JSON.stringify(patch) });
   }, []);
 
+  const saveHeroSlide = useCallback((slide: HeroSlide) => {
+    setSettings((prev) => {
+      const exists = prev.heroSlides.some((s) => s.id === slide.id);
+      const nextOrder = exists
+        ? slide.order
+        : prev.heroSlides.length > 0
+        ? Math.max(...prev.heroSlides.map((s) => s.order)) + 1
+        : 1;
+      const heroSlides = exists
+        ? prev.heroSlides.map((s) => (s.id === slide.id ? { ...slide, order: s.order } : s))
+        : [
+            ...prev.heroSlides,
+            { ...slide, id: slide.id || `slide-${Date.now()}`, order: nextOrder },
+          ];
+      persistHeroSlides(heroSlides);
+      return { ...prev, heroSlides };
+    });
+  }, []);
+
+  const deleteHeroSlide = useCallback((id: string) => {
+    setSettings((prev) => {
+      const heroSlides = prev.heroSlides
+        .filter((s) => s.id !== id)
+        .sort((a, b) => a.order - b.order)
+        .map((s, i) => ({ ...s, order: i + 1 }));
+      persistHeroSlides(heroSlides);
+      return { ...prev, heroSlides };
+    });
+  }, []);
+
+  const reorderHeroSlide = useCallback((id: string, dir: -1 | 1) => {
+    setSettings((prev) => {
+      const sorted = [...prev.heroSlides].sort((a, b) => a.order - b.order);
+      const idx = sorted.findIndex((s) => s.id === id);
+      const swap = idx + dir;
+      if (idx < 0 || swap < 0 || swap >= sorted.length) return prev;
+      const a = sorted[idx];
+      const b = sorted[swap];
+      sorted[idx] = { ...b, order: a.order };
+      sorted[swap] = { ...a, order: b.order };
+      const heroSlides = sorted.sort((x, y) => x.order - y.order);
+      persistHeroSlides(heroSlides);
+      return { ...prev, heroSlides };
+    });
+  }, []);
+
   const saveCoupon = useCallback((coupon: Coupon) => {
     setCoupons((prev) => {
       const exists = prev.some((c) => c.code === coupon.code);
@@ -693,6 +790,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setReviewStatus,
     settings,
     saveSettings,
+    saveHeroSlide,
+    deleteHeroSlide,
+    reorderHeroSlide,
     coupons,
     saveCoupon,
     deleteCoupon,

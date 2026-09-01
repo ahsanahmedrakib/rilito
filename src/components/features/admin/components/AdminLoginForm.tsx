@@ -8,7 +8,7 @@ import {
   type AdminLoginValues,
 } from "@/features/admin/data/adminSchemas";
 import { cn } from "@/lib/utils";
-import { EyeIcon, EyeOffIcon, LogoMark, LockIcon } from "@/components/shared/components/icons";
+import { EyeIcon, EyeOffIcon, LogoMark, LockIcon, MailIcon } from "@/components/shared/components/icons";
 
 const inputCls =
   "w-full rounded-xl border border-ink-200 bg-white pl-11 pr-4 py-3 text-sm text-ink-900 outline-none transition placeholder:text-ink-400 focus:border-ink-950";
@@ -62,7 +62,10 @@ export function AdminLoginForm({
           <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-ink-600">
             Email
           </label>
-          <input type="email" placeholder="admin@rilito.com" className={inputCls} {...register("email")} />
+          <div className="relative">
+            <MailIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+            <input type="email" placeholder="admin@rilito.com" className={inputCls} {...register("email")} />
+          </div>
           {errors.email && (
             <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
               {errors.email.message}

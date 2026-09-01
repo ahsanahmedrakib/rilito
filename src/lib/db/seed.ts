@@ -3,7 +3,46 @@ import type mongoose from "mongoose";
 import { categories as seedCategories, allProducts } from "@/lib/data";
 import { defaultCoupons } from "@/lib/coupons";
 
-const SETTING_KEYS = ["qrImage", "paymentNumber", "paymentNote", "marqueeTexts"] as const;
+const SETTING_KEYS = ["qrImage", "paymentNumber", "paymentNote", "marqueeTexts", "heroSlides"] as const;
+
+export const DEFAULT_HERO_SLIDES = [
+  {
+    id: "slide-tshirts",
+    image:
+      "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "New Season · Street & Classic",
+    title: "Wear The Moment",
+    subtitle:
+      "Heavyweight tees, sharp shirts and relaxed fits — cut for the way you actually dress.",
+    cta: { href: "/category/t-shirts", label: "Shop T-Shirts" },
+    order: 1,
+    active: true,
+  },
+  {
+    id: "slide-panjabi",
+    image:
+      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "Panjabi · Eid & Beyond",
+    title: "Elegance In Every Thread",
+    subtitle:
+      "From classic cotton to intricate embroidery, find the panjabi that carries the occasion.",
+    cta: { href: "/category/panjabi", label: "Explore Panjabi" },
+    order: 2,
+    active: true,
+  },
+  {
+    id: "slide-winter",
+    image:
+      "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "Winter Drop · Up to 40% Off",
+    title: "Bundle Up In Style",
+    subtitle:
+      "Quilted bombers, puffer jackets and cosy knits that handle the cold without hiding your look.",
+    cta: { href: "/category/winter", label: "Shop Winter" },
+    order: 3,
+    active: true,
+  },
+];
 
 const SETTING_DEFAULTS: Record<(typeof SETTING_KEYS)[number], unknown> = {
   qrImage: "",
@@ -15,6 +54,7 @@ const SETTING_DEFAULTS: Record<(typeof SETTING_KEYS)[number], unknown> = {
     "CASH ON DELIVERY ACROSS BANGLADESH",
     "7-DAY EASY EXCHANGE ON ALL ORDERS",
   ],
+  heroSlides: DEFAULT_HERO_SLIDES,
 };
 
 /** Seed defaults only when collections are empty. Safe to call repeatedly. */
@@ -101,7 +141,7 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
 }
 
 export async function readSettings() {
-  const [qrImage, paymentNumber, paymentNote, marqueeTexts] =
+  const [qrImage, paymentNumber, paymentNote, marqueeTexts, heroSlides] =
     await Promise.all([
       getSetting<string>("qrImage", ""),
       getSetting<string>("paymentNumber", "01611-773755"),
@@ -113,6 +153,10 @@ export async function readSettings() {
         "marqueeTexts",
         SETTING_DEFAULTS.marqueeTexts as string[]
       ),
+      getSetting<typeof DEFAULT_HERO_SLIDES>(
+        "heroSlides",
+        DEFAULT_HERO_SLIDES
+      ),
     ]);
-  return { qrImage, paymentNumber, paymentNote, marqueeTexts };
+  return { qrImage, paymentNumber, paymentNote, marqueeTexts, heroSlides };
 }

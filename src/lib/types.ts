@@ -120,6 +120,19 @@ export interface AppSettings {
   paymentNote: string;
   /** Announcement marquee messages shown above the navbar. */
   marqueeTexts: string[];
+  /** Hero banner slides shown on the public home page. */
+  heroSlides: HeroSlide[];
+}
+
+export interface HeroSlide {
+  id: string;
+  image: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  cta: { href: string; label: string };
+  order: number;
+  active?: boolean;
 }
 
 export interface ContactQuery {

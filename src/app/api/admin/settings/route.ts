@@ -37,6 +37,7 @@ export async function PATCH(request: NextRequest) {
       { key: "paymentNumber", isArray: false },
       { key: "paymentNote", isArray: false },
       { key: "marqueeTexts", isArray: true },
+      { key: "heroSlides", isArray: true },
     ];
     for (const { key, isArray } of keys) {
       if (body[key] !== undefined) {

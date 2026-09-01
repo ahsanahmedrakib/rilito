@@ -11,11 +11,14 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "@/components/shared/components/icons";
+import { useStore } from "@/lib/store";
+import type { HeroSlide } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 
-const slides = [
+const fallbackSlides: HeroSlide[] = [
   {
+    id: "slide-tshirts",
     image:
       "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1600&q=80",
     eyebrow: "New Season · Street & Classic",
@@ -23,8 +26,11 @@ const slides = [
     subtitle:
       "Heavyweight tees, sharp shirts and relaxed fits — cut for the way you actually dress.",
     cta: { href: "/category/t-shirts", label: "Shop T-Shirts" },
+    order: 1,
+    active: true,
   },
   {
+    id: "slide-panjabi",
     image:
       "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=1600&q=80",
     eyebrow: "Panjabi · Eid & Beyond",
@@ -32,8 +38,11 @@ const slides = [
     subtitle:
       "From classic cotton to intricate embroidery, find the panjabi that carries the occasion.",
     cta: { href: "/category/panjabi", label: "Explore Panjabi" },
+    order: 2,
+    active: true,
   },
   {
+    id: "slide-winter",
     image:
       "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=1600&q=80",
     eyebrow: "Winter Drop · Up to 40% Off",
@@ -41,14 +50,27 @@ const slides = [
     subtitle:
       "Quilted bombers, puffer jackets and cosy knits that handle the cold without hiding your look.",
     cta: { href: "/category/winter", label: "Shop Winter" },
+    order: 3,
+    active: true,
   },
 ];
 
 export function HeroSlider() {
   const swiper = useRef<SwiperClass | null>(null);
+  const { settings, ready } = useStore();
+
+  const source = !ready ? fallbackSlides : settings.heroSlides;
+  const slides = (source && source.length
+    ? source
+    : fallbackSlides
+  )
+    .filter((s) => s.active !== false)
+    .sort((a, b) => a.order - b.order);
+
+  if (slides.length === 0) return null;
 
   return (
-    <section className="relative aspect-[4/5] overflow-hidden bg-ink-950 sm:aspect-[16/9] lg:aspect-[21/9]">
+    <section className="relative aspect-4/5 overflow-hidden bg-ink-950 sm:aspect-video lg:aspect-21/9">
       <Swiper
         modules={[Autoplay, EffectFade, Pagination]}
         effect="fade"
@@ -60,7 +82,7 @@ export function HeroSlider() {
         className="h-full w-full"
       >
         {slides.map((slide) => (
-          <SwiperSlide key={slide.title}>
+          <SwiperSlide key={slide.id}>
             <div className="relative h-full w-full">
               <Image
                 src={slide.image}
@@ -69,7 +91,7 @@ export function HeroSlider() {
                 priority
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-ink-950/85 via-ink-950/45 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-r from-ink-950/85 via-ink-950/45 to-transparent" />
               <div className="relative flex h-full items-center">
                 <div className="mx-auto w-full max-w-7xl px-4 md:px-6 lg:px-8">
                   <div className="max-w-xl">
@@ -84,10 +106,10 @@ export function HeroSlider() {
                     </p>
                     <div className="mt-7 flex flex-wrap items-center gap-3">
                       <Link
-                        href={slide.cta.href}
+                        href={slide.cta?.href ?? "/products"}
                         className="rounded-full bg-brand-600 px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg shadow-brand-600/30 transition hover:-translate-y-0.5 hover:bg-brand-700"
                       >
-                        {slide.cta.label}
+                        {slide.cta?.label ?? "Shop Now"}
                       </Link>
                       <Link
                         href="/products"
