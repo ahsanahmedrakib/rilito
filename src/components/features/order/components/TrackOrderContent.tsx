@@ -6,6 +6,7 @@ import {
   TruckIcon,
 } from "@/components/shared/components/icons";
 import { useStore } from "@/lib/store";
+import type { Order } from "@/lib/types";
 import { cn, formatDate, formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
@@ -25,17 +26,38 @@ export function TrackOrderContent() {
     found: boolean;
     orderId: string;
   }>(null);
+  const [order, setOrder] = useState<Order | null>(null);
+  const [searching, setSearching] = useState(false);
 
-  const search = () => {
-    const exists = orders.find(
-      (o) => o.id.toLowerCase() === query.trim().toLowerCase(),
-    );
-    setResult({ found: !!exists, orderId: query.trim() });
+  const search = async () => {
+    const q = query.trim();
+    if (!q) return;
+    setResult({ found: false, orderId: q });
+    setOrder(null);
+
+    const local = orders.find((o) => o.id.toLowerCase() === q.toLowerCase());
+    if (local) {
+      setOrder(local);
+      setResult({ found: true, orderId: local.id });
+      return;
+    }
+
+    setSearching(true);
+    try {
+      const res = await fetch(`/api/orders?id=${encodeURIComponent(q)}`);
+      const json = (await res.json()) as { order?: Order; error?: string };
+      if (res.ok && json.order) {
+        setOrder(json.order);
+        setResult({ found: true, orderId: json.order.id });
+      } else {
+        setResult({ found: false, orderId: q });
+      }
+    } catch {
+      setResult({ found: false, orderId: q });
+    } finally {
+      setSearching(false);
+    }
   };
-
-  const order = result?.found
-    ? orders.find((o) => o.id === result.orderId)
-    : undefined;
 
   const activeStep = order ? steps.indexOf(order.status) : -1;
 
@@ -63,10 +85,15 @@ export function TrackOrderContent() {
         />
         <button
           onClick={search}
-          className="grid w-14 place-items-center rounded-xl bg-ink-950 text-white transition hover:bg-brand-600"
+          disabled={searching}
+          className="grid w-14 place-items-center rounded-xl bg-ink-950 text-white transition hover:bg-brand-600 disabled:opacity-60"
           aria-label="Track order"
         >
-          <SearchIcon className="h-5 w-5" />
+          {searching ? (
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+          ) : (
+            <SearchIcon className="h-5 w-5" />
+          )}
         </button>
       </div>
 
@@ -213,6 +240,7 @@ export function TrackOrderContent() {
                 key={o.id}
                 onClick={() => {
                   setQuery(o.id);
+                  setOrder(o);
                   setResult({ found: true, orderId: o.id });
                 }}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-bold text-ink-800 ring-1 ring-ink-200 transition hover:ring-brand-600"

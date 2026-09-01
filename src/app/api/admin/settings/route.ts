@@ -36,16 +36,21 @@ export async function PATCH(request: NextRequest) {
       { key: "qrImage", isArray: false },
       { key: "paymentNumber", isArray: false },
       { key: "paymentNote", isArray: false },
+      { key: "shippingFee", isArray: false },
+      { key: "freeShippingThreshold", isArray: false },
       { key: "marqueeTexts", isArray: true },
       { key: "heroSlides", isArray: true },
     ];
     for (const { key, isArray } of keys) {
       if (body[key] !== undefined) {
-        const value = isArray
-          ? Array.isArray(body[key])
-            ? body[key]
-            : [body[key]]
-          : String(body[key]);
+        let value: unknown;
+        if (isArray) {
+          value = Array.isArray(body[key]) ? body[key] : [body[key]];
+        } else if (key === "shippingFee" || key === "freeShippingThreshold") {
+          value = Number(body[key]) || 0;
+        } else {
+          value = String(body[key]);
+        }
         await Setting.updateOne(
           { key },
           { $set: { value } },

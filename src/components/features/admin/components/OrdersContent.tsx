@@ -124,6 +124,12 @@ export default function OrdersContent() {
                         <p>
                           <span className="font-bold">Payment:</span> {o.payment}
                         </p>
+                        {o.transactionId && (
+                          <p>
+                            <span className="font-bold">Transaction ID:</span>{" "}
+                            <span className="font-mono text-xs">{o.transactionId}</span>
+                          </p>
+                        )}
                         <dl className="mt-2 space-y-1 border-t border-ink-100 pt-3 text-sm">
                           <div className="flex justify-between"><dt className="text-ink-500">Subtotal</dt><dd className="font-semibold">{formatPrice(o.subtotal)}</dd></div>
                           {o.discount > 0 && (

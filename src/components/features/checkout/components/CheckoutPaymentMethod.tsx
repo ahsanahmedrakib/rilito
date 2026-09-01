@@ -3,25 +3,32 @@
 import { CashIcon, LockIcon } from "@/components/shared/components/icons";
 import { useStore } from "@/lib/store";
 import { cn, formatPrice } from "@/lib/utils";
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import Image from "next/image";
 import { paymentMethods, type PaymentMethodId } from "../data/checkout";
+import type { CheckoutAddress } from "../data/checkoutSchemas";
 
 export function CheckoutPaymentMethod({
   payment,
   total,
   phone,
   onSelect,
+  register,
+  errors,
 }: {
   payment: PaymentMethodId;
   total: number;
   phone: string;
   onSelect: (id: PaymentMethodId) => void;
+  register: UseFormRegister<CheckoutAddress>;
+  errors: FieldErrors<CheckoutAddress>;
 }) {
   const { settings } = useStore();
 
   return (
     <section className="rounded-3xl bg-white p-6 ring-1 ring-ink-200/60 md:p-8">
       <h2 className="text-lg font-extrabold uppercase tracking-tight text-ink-950">
-        3 · Payment Method
+        2 · Payment Method
       </h2>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {paymentMethods.map((m) => (
@@ -56,13 +63,39 @@ export function CheckoutPaymentMethod({
           <p className="mt-1">{settings.paymentNote}</p>
           {settings.qrImage && (
             <div className="mt-3 inline-block rounded-2xl border border-amber-200 bg-white p-3">
-              <img
+              <Image
                 src={settings.qrImage}
                 alt="Payment QR code"
-                className="h-40 w-40 rounded-lg object-contain"
+                className="h-44 w-44 rounded-lg object-contain"
+                height={176}
+                width={176}
               />
             </div>
           )}
+
+          <div className="mt-4">
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-amber-900">
+              Transaction ID *
+            </label>
+            <input
+              className={cn(
+                "w-full rounded-xl border border-amber-300 bg-white px-4 py-3 text-sm font-semibold text-ink-900 outline-none transition placeholder:font-normal placeholder:text-ink-400 focus:border-amber-500",
+                errors.transactionId && "border-red-400",
+              )}
+              placeholder="e.g. trx9W2kLmN"
+              {...register("transactionId")}
+            />
+            {errors.transactionId && (
+              <p className="mt-1 text-xs font-semibold text-red-600" role="alert">
+                {errors.transactionId.message}
+              </p>
+            )}
+            <p className="mt-1.5 text-amber-700">
+              Enter the transaction/reference ID from your payment app — your
+              order is confirmed once it&apos;s verified.
+            </p>
+          </div>
+
           <p className="mt-2">
             Your order will be confirmed once payment is verified — our team
             will call you on{" "}

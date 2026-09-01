@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       city: String(body.city ?? ""),
       area: String(body.area ?? ""),
       payment: String(body.payment ?? "cod"),
+      transactionId: String(body.transactionId ?? ""),
       status: "Order Placed",
       date: new Date().toISOString(),
     });

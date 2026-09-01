@@ -14,6 +14,7 @@ export const checkoutSchema = yup.object({
   city: yup.string().required("Pick a city"),
   area: yup.string(),
   note: yup.string(),
+  transactionId: yup.string(),
 });
 
 export type CheckoutAddress = yup.InferType<typeof checkoutSchema>;

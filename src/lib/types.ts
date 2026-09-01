@@ -90,6 +90,8 @@ export interface Order {
   city: string;
   area: string;
   payment: string;
+  /** Transaction / reference ID for prepaid (QR) payments. */
+  transactionId?: string;
   status: string;
   date: string;
   tracking?: {
@@ -118,6 +120,10 @@ export interface AppSettings {
   qrImage: string;
   paymentNumber: string;
   paymentNote: string;
+  /** Standard delivery fee in BDT. */
+  shippingFee: number;
+  /** Orders at or above this subtotal get FREE standard delivery. */
+  freeShippingThreshold: number;
   /** Announcement marquee messages shown above the navbar. */
   marqueeTexts: string[];
   /** Hero banner slides shown on the public home page. */

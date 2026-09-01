@@ -219,6 +219,8 @@ const defaultSettings: AppSettings = {
   qrImage: "",
   paymentNumber: "01611-773755",
   paymentNote: "Send to this number and keep the transaction ID.",
+  shippingFee: 100,
+  freeShippingThreshold: 2000,
   marqueeTexts: [
     "FREE DELIVERY ON ORDERS OVER ৳2,000",
     "FLAT 40% OFF SELECTED STYLES — SALE NOW LIVE",

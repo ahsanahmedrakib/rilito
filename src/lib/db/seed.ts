@@ -3,7 +3,15 @@ import type mongoose from "mongoose";
 import { categories as seedCategories, allProducts } from "@/lib/data";
 import { defaultCoupons } from "@/lib/coupons";
 
-const SETTING_KEYS = ["qrImage", "paymentNumber", "paymentNote", "marqueeTexts", "heroSlides"] as const;
+const SETTING_KEYS = [
+  "qrImage",
+  "paymentNumber",
+  "paymentNote",
+  "shippingFee",
+  "freeShippingThreshold",
+  "marqueeTexts",
+  "heroSlides",
+] as const;
 
 export const DEFAULT_HERO_SLIDES = [
   {
@@ -48,6 +56,8 @@ const SETTING_DEFAULTS: Record<(typeof SETTING_KEYS)[number], unknown> = {
   qrImage: "",
   paymentNumber: "01611-773755",
   paymentNote: "Send to this number and keep the transaction ID.",
+  shippingFee: 100,
+  freeShippingThreshold: 2000,
   marqueeTexts: [
     "FREE DELIVERY ON ORDERS OVER ৳2,000",
     "FLAT 40% OFF SELECTED STYLES — SALE NOW LIVE",
@@ -141,22 +151,42 @@ export async function getSetting<T>(key: string, fallback: T): Promise<T> {
 }
 
 export async function readSettings() {
-  const [qrImage, paymentNumber, paymentNote, marqueeTexts, heroSlides] =
-    await Promise.all([
-      getSetting<string>("qrImage", ""),
-      getSetting<string>("paymentNumber", "01611-773755"),
-      getSetting<string>(
-        "paymentNote",
-        "Send to this number and keep the transaction ID."
-      ),
-      getSetting<string[]>(
-        "marqueeTexts",
-        SETTING_DEFAULTS.marqueeTexts as string[]
-      ),
-      getSetting<typeof DEFAULT_HERO_SLIDES>(
-        "heroSlides",
-        DEFAULT_HERO_SLIDES
-      ),
-    ]);
-  return { qrImage, paymentNumber, paymentNote, marqueeTexts, heroSlides };
+  const [
+    qrImage,
+    paymentNumber,
+    paymentNote,
+    shippingFee,
+    freeShippingThreshold,
+    marqueeTexts,
+    heroSlides,
+  ] = await Promise.all([
+    getSetting<string>("qrImage", ""),
+    getSetting<string>("paymentNumber", "01611-773755"),
+    getSetting<string>(
+      "paymentNote",
+      "Send to this number and keep the transaction ID."
+    ),
+    getSetting<number>("shippingFee", SETTING_DEFAULTS.shippingFee as number),
+    getSetting<number>(
+      "freeShippingThreshold",
+      SETTING_DEFAULTS.freeShippingThreshold as number
+    ),
+    getSetting<string[]>(
+      "marqueeTexts",
+      SETTING_DEFAULTS.marqueeTexts as string[]
+    ),
+    getSetting<typeof DEFAULT_HERO_SLIDES>(
+      "heroSlides",
+      DEFAULT_HERO_SLIDES
+    ),
+  ]);
+  return {
+    qrImage,
+    paymentNumber,
+    paymentNote,
+    shippingFee,
+    freeShippingThreshold,
+    marqueeTexts,
+    heroSlides,
+  };
 }

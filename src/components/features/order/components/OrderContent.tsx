@@ -168,6 +168,14 @@ export function OrderContent({ id }: { id: string }) {
                 {order.payment}
               </span>
             </div>
+            {order.transactionId && (
+              <div className="flex justify-between">
+                <span className="text-ink-600">Transaction ID</span>
+                <span className="font-mono text-xs text-ink-950">
+                  {order.transactionId}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-ink-600">Subtotal</span>
               <span>{formatPrice(order.subtotal)}</span>

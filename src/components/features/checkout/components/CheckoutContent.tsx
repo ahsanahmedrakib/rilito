@@ -9,26 +9,33 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  FREE_SHIPPING_THRESHOLD,
   quoteShipping,
-  type DeliveryMethodId,
   type PaymentMethodId,
 } from "../data/checkout";
 import { checkoutSchema, type CheckoutAddress } from "../data/checkoutSchemas";
 import { CheckoutAddressForm } from "./CheckoutAddressForm";
-import { CheckoutDeliveryMethod } from "./CheckoutDeliveryMethod";
 import { CheckoutPaymentMethod } from "./CheckoutPaymentMethod";
 import { CheckoutSummary } from "./CheckoutSummary";
 
 export function CheckoutContent() {
-  const { cart, cartSubtotal, clearCart, placeOrder, toast, user, coupons } =
-    useStore();
+  const {
+    cart,
+    cartSubtotal,
+    clearCart,
+    placeOrder,
+    toast,
+    user,
+    coupons,
+    settings,
+  } = useStore();
   const router = useRouter();
 
   const {
     register,
     handleSubmit,
     watch,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<CheckoutAddress>({
     resolver: yupResolver(checkoutSchema),
@@ -40,15 +47,19 @@ export function CheckoutContent() {
       city: user?.city ?? "Dhaka",
       area: "",
       note: "",
+      transactionId: "",
     },
   });
   const phone = watch("phone");
-  const [delivery, setDelivery] = useState<DeliveryMethodId>("standard");
   const [payment, setPayment] = useState<PaymentMethodId>("cod");
   const [discount, setDiscount] = useState(0);
   const [placing, setPlacing] = useState(false);
 
-  const shipping = quoteShipping({ subtotal: cartSubtotal, delivery });
+  const shippingConfig = {
+    shippingFee: Number(settings.shippingFee) || 0,
+    freeShippingThreshold: Number(settings.freeShippingThreshold) || 0,
+  };
+  const shipping = quoteShipping({ subtotal: cartSubtotal, config: shippingConfig });
   const total = cartSubtotal - discount + shipping;
 
   const applyPromo = (code: string) => {
@@ -65,6 +76,14 @@ export function CheckoutContent() {
   };
 
   const place = handleSubmit((values: CheckoutAddress) => {
+    if (payment === "qr" && !values.transactionId?.trim()) {
+      setError("transactionId", {
+        type: "required",
+        message: "Transaction ID is required for QR payment",
+      });
+      return;
+    }
+    clearErrors("transactionId");
     setPlacing(true);
     setTimeout(async () => {
       const order = await placeOrder({
@@ -79,6 +98,7 @@ export function CheckoutContent() {
         city: values.city,
         area: values.area ?? "",
         payment,
+        transactionId: payment === "qr" ? values.transactionId?.trim() : "",
       });
       clearCart();
       setPlacing(false);
@@ -115,16 +135,14 @@ export function CheckoutContent() {
       <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_400px]">
         <div className="space-y-6">
           <CheckoutAddressForm register={register} errors={errors} />
-          <CheckoutDeliveryMethod
-            delivery={delivery}
-            freeDelivery={cartSubtotal >= FREE_SHIPPING_THRESHOLD}
-            onSelect={setDelivery}
-          />
+
           <CheckoutPaymentMethod
             payment={payment}
             total={total}
             phone={phone}
             onSelect={setPayment}
+            register={register}
+            errors={errors}
           />
         </div>
 

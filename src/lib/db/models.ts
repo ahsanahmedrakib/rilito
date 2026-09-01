@@ -220,6 +220,7 @@ export interface OrderDoc {
   city: string;
   area: string;
   payment: string;
+  transactionId?: string;
   status: string;
   date: string;
   tracking?: { courier: string; trackingId: string; note: string };
@@ -240,6 +241,7 @@ const OrderSchema = new Schema<OrderDoc>(
     city: { type: String, default: "" },
     area: { type: String, default: "" },
     payment: { type: String, default: "cod" },
+    transactionId: { type: String, default: "" },
     status: { type: String, default: "Order Placed" },
     date: { type: String, default: () => new Date().toISOString() },
     tracking: {
