@@ -13,7 +13,8 @@ export async function generateMetadata({
   if (slug === "faq")
     return {
       title: "FAQ — Rilito",
-      description: "Answers to common questions about Rilito orders, sizing, delivery and returns.",
+      description:
+        "Answers to common questions about Rilito orders, sizing, delivery and returns.",
       alternates: { canonical: `/pages/faq` },
     };
   const settings = await readSettingsSafely();
@@ -22,7 +23,8 @@ export async function generateMetadata({
   return {
     title: page.title,
     description:
-      page.sections[0]?.body[0] ?? "Learn more about Rilito — modern menswear for Bangladesh.",
+      page.sections[0]?.body[0] ??
+      "Learn more about 𝐑𝐈𝐋𝐈𝐓𝐎  — 𝐑𝐄𝐃𝐄𝐅𝐈𝐍𝐄 𝐘𝐎𝐔𝐑 𝐒𝐓𝐘𝐋𝐄.",
     alternates: { canonical: `/pages/${slug}` },
   };
 }
@@ -105,3 +107,5 @@ export default async function Page({
     </div>
   );
 }
+
+

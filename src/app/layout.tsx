@@ -1,15 +1,15 @@
 import { Toaster } from "@/components/shared/components/Toaster";
-import { CartDrawer } from "@/features/cart/components/CartDrawer";
-import { Footer } from "@/features/footer/components/Footer";
-import { Header } from "@/features/header/components/Header";
-import { MobileMenu } from "@/features/header/components/MobileMenu";
-import { SearchOverlay } from "@/features/search/components/SearchOverlay";
 import {
   SITE_URL,
   STORE_ADDRESS,
   WEBSITE_NAME,
   socialLinks,
 } from "@/components/shared/data/site";
+import { CartDrawer } from "@/features/cart/components/CartDrawer";
+import { Footer } from "@/features/footer/components/Footer";
+import { Header } from "@/features/header/components/Header";
+import { MobileMenu } from "@/features/header/components/MobileMenu";
+import { SearchOverlay } from "@/features/search/components/SearchOverlay";
 import { StoreProvider } from "@/lib/store";
 import type { Metadata } from "next";
 import { Archivo, Geist_Mono } from "next/font/google";
@@ -26,7 +26,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const title = "Rilito — Modern Menswear for Bangladesh";
+const title = "𝐑𝐈𝐋𝐈𝐓𝐎 — 𝐑𝐄𝐃𝐄𝐅𝐈𝐍𝐄 𝐘𝐎𝐔𝐑 𝐒𝐓𝐘𝐋𝐄";
 const description =
   "Shop Rilito for premium panjabi, t-shirts, shirts, pants, winter fashion and footwear. Free delivery over ৳2,000 and cash on delivery across Bangladesh.";
 
@@ -144,3 +144,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+
