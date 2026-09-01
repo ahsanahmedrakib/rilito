@@ -78,6 +78,12 @@ export async function POST(request: NextRequest) {
       rating: body.rating !== undefined ? Number(body.rating) : 0,
       reviewCount: body.reviewCount !== undefined ? Number(body.reviewCount) : 0,
       stock: body.stock !== undefined ? Number(body.stock) : 0,
+      sizeStock:
+        body.sizeStock !== undefined && typeof body.sizeStock === "object"
+          ? (body.sizeStock as Record<string, number>)
+          : undefined,
+      sizeGuideImage:
+        body.sizeGuideImage !== undefined ? String(body.sizeGuideImage) : undefined,
       isBestSeller: Boolean(body.isBestSeller),
       isNew: Boolean(body.isNew),
       featured: Boolean(body.featured),
