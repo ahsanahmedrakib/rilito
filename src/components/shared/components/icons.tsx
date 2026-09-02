@@ -219,6 +219,9 @@ export const InfoIcon = make(
 export const FacebookIcon = makeFilled(
   <path d="M14 8h3V4.5h-3c-2.5 0-4 1.8-4 4.2V11H7v3.5h3V21h3.5v-6.5h2.7l.5-3.5h-3.2V9c0-.6.3-1 .7-1z" />
 );
+export const MessengerIcon = makeFilled(
+  <path d="M12 2C6.36 2 2 6.14 2 11.47c0 2.93 1.38 5.53 3.54 7.29V22l3.28-1.79c.98.27 2 .42 3.18.42 5.64 0 10-4.14 10-9.16C22 6.14 17.64 2 12 2zm5.1 6.72l-2.71 2.92a.72.72 0 0 1-.92.09l-1.9-1.28a.48.48 0 0 0-.56.03l-3.4 3.2c-.26.24-.66-.11-.44-.39l2.71-2.89a.72.72 0 0 1 .92-.09l1.9 1.27a.48.48 0 0 0 .56-.03l3.4-3.2c.26-.24.66.11.44.39z" />
+);
 export const InstagramIcon = makeFilled(
   <>
     <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinejoin="round" />
