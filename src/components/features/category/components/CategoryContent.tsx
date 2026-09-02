@@ -2,6 +2,7 @@
 
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ArrowRight } from "@/components/shared/components/icons";
+import { FadeIn } from "@/components/shared/components/FadeIn";
 import { ProductCard } from "@/features/product/components/ProductCard";
 import { useStore } from "@/lib/store";
 import Image from "next/image";
@@ -65,6 +66,7 @@ export default function CategoryContent({ slug }: { slug: string }) {
         </div>
       </section>
 
+      <FadeIn>
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <p className="text-sm text-ink-500">
@@ -96,6 +98,7 @@ export default function CategoryContent({ slug }: { slug: string }) {
           </div>
         )}
       </section>
+      </FadeIn>
     </>
   );
 }

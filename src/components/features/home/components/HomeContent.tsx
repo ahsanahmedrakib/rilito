@@ -10,6 +10,7 @@ import {
 } from "@/components/shared/components/icons";
 import { SectionHeading } from "@/components/shared/components/SectionHeading";
 import { SiteSkeleton } from "@/components/shared/components/SiteSkeleton";
+import { FadeIn } from "@/components/shared/components/FadeIn";
 import { HeroSlider } from "@/features/home/components/HeroSlider";
 import { Newsletter } from "@/features/home/components/Newsletter";
 import { ProductScroller } from "@/features/product/components/ProductScroller";
@@ -61,6 +62,7 @@ export default function HomeContent() {
     <>
       <HeroSlider />
 
+      <FadeIn>
       <section className="mx-auto max-w-7xl px-4 py-12 md:px-6 lg:px-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {homeValues.map((v) => {
@@ -84,7 +86,9 @@ export default function HomeContent() {
           })}
         </div>
       </section>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <section className="mx-auto max-w-7xl px-4 pb-4 md:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Curated Collections"
@@ -127,7 +131,9 @@ export default function HomeContent() {
           ))}
         </div>
       </section>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <section className="mx-auto max-w-7xl px-4 pb-4 md:px-6 lg:px-8">
         <div className="pt-12 md:pt-16">
           <SectionHeading
@@ -139,7 +145,9 @@ export default function HomeContent() {
           <ProductScroller products={bestSellers.slice(0, 10)} />
         </div>
       </section>
+      </FadeIn>
 
+      <FadeIn direction="left">
       <section className="relative mt-10 overflow-hidden bg-ink-950">
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-14 md:grid-cols-2 md:px-6 lg:px-8">
           <div className="relative order-2 aspect-4/3 overflow-hidden rounded-3xl md:order-1">
@@ -177,7 +185,9 @@ export default function HomeContent() {
           </div>
         </div>
       </section>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <section className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
         <div className="pt-12 md:pt-16">
           <SectionHeading
@@ -191,12 +201,13 @@ export default function HomeContent() {
           />
         </div>
       </section>
+      </FadeIn>
 
       {(["pants", "t-shirts", "shirts"] as const).map((catSlug, idx) => {
         const cat = categories.find((c) => c.slug === catSlug)!;
         return (
+          <FadeIn key={catSlug} delay={idx * 100}>
           <section
-            key={catSlug}
             className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8"
           >
             <div className="pt-12 md:pt-16">
@@ -255,9 +266,11 @@ export default function HomeContent() {
               </div>
             </div>
           </section>
+          </FadeIn>
         );
       })}
 
+      <FadeIn direction="right">
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Wall of Love"
@@ -294,7 +307,9 @@ export default function HomeContent() {
           ))}
         </div>
       </section>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <section className="mx-auto max-w-7xl px-4 pb-4 md:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Style Journal"
@@ -336,10 +351,13 @@ export default function HomeContent() {
           ))}
         </div>
       </section>
+      </FadeIn>
 
+      <FadeIn>
       <div className="mt-16">
         <Newsletter />
       </div>
+      </FadeIn>
     </>
   );
 }

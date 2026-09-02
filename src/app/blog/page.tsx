@@ -1,5 +1,6 @@
 import { ArrowRight } from "@/components/shared/components/icons";
 import { readSettingsSafely } from "@/lib/db/seed";
+import { FadeIn } from "@/components/shared/components/FadeIn";
 import { formatDate } from "@/lib/utils";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -20,6 +21,7 @@ export default async function BlogIndexPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:px-6 lg:px-8">
+      <FadeIn>
       <div className="max-w-2xl">
         <p className="text-xs font-bold uppercase tracking-[0.25em] text-brand-600">
           Style Journal
@@ -32,8 +34,10 @@ export default async function BlogIndexPage() {
           every great fit.
         </p>
       </div>
+      </FadeIn>
 
       {!featured ? (
+        <FadeIn delay={100}>
         <div className="mt-10 rounded-3xl bg-ink-50 px-6 py-16 text-center">
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">
             No stories yet
@@ -42,8 +46,10 @@ export default async function BlogIndexPage() {
             Check back soon — the Rilito style desk is writing something.
           </p>
         </div>
+        </FadeIn>
       ) : (
         <>
+          <FadeIn delay={100}>
           <Link
             href={`/blog/${featured.slug}`}
             className="group mt-10 grid overflow-hidden rounded-3xl bg-white ring-1 ring-ink-200/60 md:grid-cols-2"
@@ -77,7 +83,9 @@ export default async function BlogIndexPage() {
               </span>
             </div>
           </Link>
+          </FadeIn>
 
+          <FadeIn delay={200}>
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {rest.map((post) => (
               <Link
@@ -111,6 +119,7 @@ export default async function BlogIndexPage() {
               </Link>
             ))}
           </div>
+          </FadeIn>
         </>
       )}
     </div>

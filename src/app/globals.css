@@ -152,6 +152,73 @@ body {
   animation: logo-pulse 1.6s ease-in-out infinite;
 }
 
+/* ── Scroll-reveal animations ─────────────────────────── */
+
+.fade-in-hidden {
+  opacity: 0;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.fade-slide-up {
+  transform: translateY(36px);
+}
+.fade-slide-down {
+  transform: translateY(-36px);
+}
+.fade-slide-left {
+  transform: translateX(36px);
+}
+.fade-slide-right {
+  transform: translateX(-36px);
+}
+
+.fade-in-visible {
+  opacity: 1 !important;
+  transform: translate(0, 0) !important;
+}
+
+/* ── Floating social bar ─────────────────────────────── */
+
+@keyframes social-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes social-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 46, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(225, 29, 46, 0);
+  }
+}
+
+.social-float-icon {
+  animation: social-bounce 2s ease-in-out infinite;
+}
+.social-float-icon:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.social-float-icon:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.social-float-icon:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.social-float-bar {
+  animation: social-pulse 3s ease-in-out infinite;
+}
+
 .swiper {
   z-index: 0;
 }

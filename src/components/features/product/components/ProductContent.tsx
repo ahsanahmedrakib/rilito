@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ProductJsonLd } from "@/features/product/components/ProductJsonLd";
+import { FadeIn } from "@/components/shared/components/FadeIn";
 import {
   CheckIcon,
   StarFilledIcon,
@@ -112,6 +113,7 @@ export default function ProductContent({ slug }: { slug: string }) {
         ]}
       />
 
+      <FadeIn>
       <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:gap-14">
         <ProductGallery images={product.images} name={product.name} />
 
@@ -136,7 +138,9 @@ export default function ProductContent({ slug }: { slug: string }) {
           </div>
         </div>
       </div>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <div className="mt-16 grid gap-10 lg:grid-cols-2">
         <div className="rounded-3xl bg-white p-6 ring-1 ring-ink-200/60 md:p-8">
           <h2 className="text-xl font-extrabold uppercase tracking-tight text-ink-950">
@@ -218,9 +222,11 @@ export default function ProductContent({ slug }: { slug: string }) {
           </div>
         </div>
       </div>
+      </FadeIn>
 
       <ReviewModal product={product} open={reviewOpen} onClose={() => setReviewOpen(false)} />
 
+      <FadeIn delay={150}>
       <section className="mt-16">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-extrabold uppercase tracking-tight text-ink-950 md:text-3xl">
@@ -237,6 +243,7 @@ export default function ProductContent({ slug }: { slug: string }) {
           <ProductScroller products={relatedProducts} />
         </div>
       </section>
+      </FadeIn>
     </div>
   );
 }

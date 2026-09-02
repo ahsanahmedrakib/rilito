@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ArrowRight } from "@/components/shared/components/icons";
+import { FadeIn } from "@/components/shared/components/FadeIn";
 import { SITE_URL } from "@/components/shared/data/site";
 import { readSettingsSafely } from "@/lib/db/seed";
 import { formatDate } from "@/lib/utils";
@@ -66,6 +67,7 @@ export default async function BlogPostPage({
         ]}
       />
 
+      <FadeIn>
       <header className="mt-8">
         <p className="flex items-center gap-2 text-xs text-ink-500">
           <span className="font-bold uppercase tracking-wide text-brand-600">
@@ -78,7 +80,9 @@ export default async function BlogPostPage({
           {post.title}
         </h1>
       </header>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <div className="relative mt-8 aspect-video overflow-hidden rounded-3xl bg-ink-100">
         <Image
           src={post.image}
@@ -88,13 +92,17 @@ export default async function BlogPostPage({
           priority
         />
       </div>
+      </FadeIn>
 
+      <FadeIn delay={150}>
       <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-700 md:text-lg">
         {post.content.map((para, i) => (
           <p key={i}>{para}</p>
         ))}
       </div>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <div className="mt-12 rounded-3xl bg-ink-950 p-8 text-center">
         <p className="text-lg font-extrabold uppercase tracking-tight text-white">
           Put these tips to work
@@ -109,8 +117,10 @@ export default async function BlogPostPage({
           Browse Collection <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
+      </FadeIn>
 
       {more.length > 0 && (
+        <FadeIn delay={100}>
         <section className="mt-12">
           <h2 className="text-lg font-extrabold uppercase tracking-tight text-ink-950">
             Keep Reading
@@ -142,6 +152,7 @@ export default async function BlogPostPage({
             ))}
           </div>
         </section>
+        </FadeIn>
       )}
     </article>
   );

@@ -3,6 +3,7 @@
 import { Suspense, useMemo } from "react";
 import { Breadcrumbs } from "@/components/shared/components/Breadcrumbs";
 import { ProductsSkeleton } from "@/components/shared/components/ProductsSkeleton";
+import { FadeIn } from "@/components/shared/components/FadeIn";
 import {
   ChevronLeft,
   ChevronRight,
@@ -104,6 +105,7 @@ function ProductsBrowser() {
         ]}
       />
 
+      <FadeIn>
       <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-2xl font-extrabold uppercase tracking-tight text-ink-950 md:text-4xl">
@@ -126,7 +128,9 @@ function ProductsBrowser() {
           <SortSelect value={sort} />
         </div>
       </div>
+      </FadeIn>
 
+      <FadeIn delay={100}>
       <div className="mt-8 grid gap-8 lg:grid-cols-[240px_1fr]">
         <aside className="lg:sticky lg:top-24 lg:h-fit lg:pb-8">
           <Suspense fallback={null}>
@@ -253,6 +257,7 @@ function ProductsBrowser() {
           )}
         </div>
       </div>
+      </FadeIn>
     </div>
   );
 }

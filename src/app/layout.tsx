@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/shared/components/Toaster";
+import { FloatingSocial } from "@/components/shared/components/FloatingSocial";
 import {
   SITE_URL,
   STORE_ADDRESS,
@@ -139,6 +140,7 @@ export default function RootLayout({
           <SearchOverlay />
           <MobileMenu />
           <Toaster />
+          <FloatingSocial />
         </StoreProvider>
       </body>
     </html>
