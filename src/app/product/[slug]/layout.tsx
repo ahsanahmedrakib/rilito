@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Product, connectDb } from "@/lib/db/models";
 import { getCategoryBySlug } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: {
